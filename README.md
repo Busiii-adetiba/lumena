@@ -121,6 +121,19 @@ pnpm --filter @lumen/server dev
 
 ---
 
+## Contributing & Open Issues
+
+We welcome open-source contributions! Check out our [Open Issues Directory](ISSUES.md) or browse our active [GitHub Issues](https://github.com/utilityjnr1/lumena/issues) to find tasks available to work on:
+
+- 🚀 **Good First Issues**: Beginner-friendly tasks for new contributors.
+- 🛡️ **Security & Policy Engine**: Enhancements for multi-op validation, timebounds, and asset limits.
+- ⚡ **Soroban Integration**: Smart contract invocation and SEP-41 token support.
+- 📦 **SDKs & DX**: React hooks package (`@lumen/react`), CLI (`@lumen/cli`), and playground app.
+
+See [ISSUES.md](ISSUES.md) for full details on how to fork the repo and submit pull requests.
+
+---
+
 ## License
 
-MIT
+MIT
