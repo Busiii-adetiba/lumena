@@ -10,6 +10,24 @@ export interface LumenClientOpts {
   serverPublicKey: string;
 }
 
+export interface SessionKeyInfo {
+  keypair: Keypair;
+  publicKey: string;
+  secretKey: string;
+  expiresAt: number;
+}
+
+export function createSessionKey(durationSeconds: number = 3600): SessionKeyInfo {
+  const keypair = Keypair.random();
+  const expiresAt = Date.now() + durationSeconds * 1000;
+  return {
+    keypair,
+    publicKey: keypair.publicKey(),
+    secretKey: keypair.secret(),
+    expiresAt,
+  };
+}
+
 export class LumenClient {
   private client: StellarClient;
   private sponsorKeypair: Keypair;
@@ -24,6 +42,10 @@ export class LumenClient {
     });
     this.sponsorKeypair = Keypair.fromSecret(opts.sponsorSecret);
     this.serverPublicKey = opts.serverPublicKey;
+  }
+
+  createSessionKey(durationSeconds: number = 3600): SessionKeyInfo {
+    return createSessionKey(durationSeconds);
   }
 
   async createWallet(): Promise<{ address: string; id: string }> {
@@ -90,3 +112,4 @@ export class LumenClient {
     return wallet.send(destination, asset, amount);
   }
 }
+
