@@ -51,7 +51,7 @@ export class CosignerService {
       };
     }
 
-    const policyResult = this.policyEngine.evaluate({
+    const policyResult = await this.policyEngine.evaluate({
       walletAddress: request.walletAddress,
       transaction: tx,
     });

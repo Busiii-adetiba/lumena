@@ -7,10 +7,12 @@ import express, {
 import { createServer as createHttpServer, type Server as HttpServer } from "node:http";
 import { Keypair } from "@stellar/stellar-sdk";
 import { StellarClient } from "@lumen/core";
-import type { Signer } from "@lumen/types";
+import type { Signer, PolicyStore } from "@lumen/types";
 import { CosignerService } from "./cosigner/service.js";
 import { FeeSponsorService } from "./fee-sponsor/service.js";
 import { PolicyEngine } from "./policy/engine.js";
+import { apiKeyAuth } from "./middleware/auth.js";
+import { rateLimiter, type RateLimiterOpts } from "./middleware/rate-limit.js";
 import {
   CosignRequestSchema,
   FeeBumpRequestSchema,
@@ -39,14 +41,26 @@ export interface ServerOpts {
   rpcUrl?: string;
   /**
    * Signer used by the co-signer service.
-   * Dev/testnet → EnvSigner.  Production → AwsKmsSigner or equivalent.
+   * Dev/testnet → EnvSigner. Production → AwsKmsSigner or equivalent.
    */
   cosignerSigner: Signer;
   /**
    * Signer used by the fee-sponsor service.
-   * Dev/testnet → EnvSigner.  Production → AwsKmsSigner or equivalent.
+   * Dev/testnet → EnvSigner. Production → AwsKmsSigner or equivalent.
    */
   feePayerSigner: Signer;
+  /**
+   * Optional custom PolicyStore driver (e.g. RedisPolicyStore).
+   */
+  policyStore?: PolicyStore;
+  /**
+   * Optional API Key for authentication middleware.
+   */
+  apiKey?: string;
+  /**
+   * Optional rate limiter configuration.
+   */
+  rateLimitOpts?: RateLimiterOpts;
 }
 
 export function createServer(opts: ServerOpts): ServerResult {
@@ -58,7 +72,7 @@ export function createServer(opts: ServerOpts): ServerResult {
     rpcUrl: opts.rpcUrl,
   });
 
-  const policyEngine = new PolicyEngine();
+  const policyEngine = new PolicyEngine({ store: opts.policyStore });
 
   const cosignerService = new CosignerService({
     client,
@@ -73,6 +87,8 @@ export function createServer(opts: ServerOpts): ServerResult {
 
   const app = express();
   app.use(express.json());
+  app.use(rateLimiter(opts.rateLimitOpts));
+  app.use(apiKeyAuth({ apiKey: opts.apiKey }));
 
   let activeRequests = 0;
 
@@ -123,13 +139,13 @@ export function createServer(opts: ServerOpts): ServerResult {
     res.json(result);
   }));
 
-  app.get("/policy/:walletId", (req: Request, res: Response) => {
-    const policy = policyEngine.getPolicy(req.params.walletId as string);
+  app.get("/policy/:walletId", wrapHandler(async (req: Request, res: Response) => {
+    const policy = await policyEngine.getPolicy(req.params.walletId as string);
     if (!policy) {
       throw new PolicyError("No policy found", 404);
     }
     res.json(policy);
-  });
+  }));
 
   app.post("/policy", wrapHandler(async (req: Request, res: Response) => {
     const parsed = PolicyRequestSchema.safeParse(req.body);
@@ -144,7 +160,7 @@ export function createServer(opts: ServerOpts): ServerResult {
       createdAt: new Date(),
     };
 
-    policyEngine.addPolicy(policy);
+    await policyEngine.addPolicy(policy);
     res.json(policy);
   }));
 

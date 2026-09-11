@@ -213,9 +213,9 @@ describe("FeeSponsorService", () => {
 });
 
 describe("PolicyEngine", () => {
-  it("approves transactions when no policy exists", () => {
+  it("approves transactions when no policy exists", async () => {
     const engine = new PolicyEngine();
-    const result = engine.evaluate({
+    const result = await engine.evaluate({
       walletAddress: Keypair.random().publicKey(),
       transaction: {} as any,
     });
@@ -223,17 +223,18 @@ describe("PolicyEngine", () => {
     expect(result.approved).toBe(true);
   });
 
-  it("stores and retrieves policies", () => {
+  it("stores and retrieves policies", async () => {
     const engine = new PolicyEngine();
     const walletId = Keypair.random().publicKey();
     const policy = createSpendLimitPolicy(walletId, "native", "100", "1000");
 
-    engine.addPolicy(policy);
-    const retrieved = engine.getPolicy(walletId);
+    await engine.addPolicy(policy);
+    const retrieved = await engine.getPolicy(walletId);
     expect(retrieved).toBeDefined();
     expect(retrieved!.walletId).toBe(walletId);
 
-    engine.removePolicy(walletId);
-    expect(engine.getPolicy(walletId)).toBeUndefined();
+    await engine.removePolicy(walletId);
+    const deleted = await engine.getPolicy(walletId);
+    expect(deleted).toBeNull();
   });
 });
