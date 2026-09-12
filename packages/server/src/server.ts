@@ -25,12 +25,15 @@ import {
   wrapHandler,
 } from "./errors.js";
 
+import { SponsorMonitorService } from "./fee-sponsor/monitor.js";
+
 export interface ServerResult {
   app: Express;
   server: HttpServer;
   client: StellarClient;
   cosignerService: CosignerService;
   feeSponsorService: FeeSponsorService;
+  sponsorMonitorService: SponsorMonitorService;
   policyEngine: PolicyEngine;
 }
 
@@ -49,6 +52,8 @@ export interface ServerOpts {
    * Dev/testnet → EnvSigner.  Production → AwsKmsSigner or equivalent.
    */
   feePayerSigner: Signer;
+  minSponsorBalance?: number;
+  sponsorPollIntervalMs?: number;
 }
 
 export function createServer(opts: ServerOpts): ServerResult {
@@ -73,6 +78,13 @@ export function createServer(opts: ServerOpts): ServerResult {
     signer: opts.feePayerSigner,
   });
 
+  const sponsorMonitorService = new SponsorMonitorService({
+    client,
+    sponsorPublicKey: opts.feePayerSigner.publicKey(),
+    minBalanceXlm: opts.minSponsorBalance,
+    pollIntervalMs: opts.sponsorPollIntervalMs,
+  });
+
   const app = express();
   app.use(express.json());
 
@@ -91,6 +103,11 @@ export function createServer(opts: ServerOpts): ServerResult {
   app.get("/health", (_req, res) => {
     res.json({ status: "ok", network: client.config.network });
   });
+
+  app.get("/sponsor/status", wrapHandler(async (_req: Request, res: Response) => {
+    const status = await sponsorMonitorService.checkBalance();
+    res.json(status);
+  }));
 
   app.post("/cosign", wrapHandler(async (req: Request, res: Response) => {
     const parsed = CosignRequestSchema.safeParse(req.body);
@@ -181,6 +198,7 @@ export function createServer(opts: ServerOpts): ServerResult {
 
   const gracefulShutdown = (signal: string) => {
     console.log(`${signal} received, shutting down gracefully`);
+    sponsorMonitorService.stop();
 
     server.close(() => {
       console.log("HTTP server closed");
@@ -207,5 +225,13 @@ export function createServer(opts: ServerOpts): ServerResult {
   process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
   process.on("SIGINT", () => gracefulShutdown("SIGINT"));
 
-  return { app, server, client, cosignerService, feeSponsorService, policyEngine };
+  return {
+    app,
+    server,
+    client,
+    cosignerService,
+    feeSponsorService,
+    sponsorMonitorService,
+    policyEngine,
+  };
 }

@@ -5,6 +5,7 @@ import type {
   SpendLimit,
   VelocityRule,
   AllowlistRule,
+  SessionKeyPolicyRule,
 } from "@lumen/types";
 
 export interface EvaluateOpts {
@@ -24,6 +25,7 @@ export class PolicyEngine {
   private readonly spendTracking: Map<string, Map<string, { dailyTotal: number; txCount: number }>> =
     new Map();
   private readonly velocityTracking: Map<string, number[]> = new Map();
+  private readonly sessionSpendTracking: Map<string, number> = new Map();
 
   addPolicy(policy: Policy): void {
     this.policies.set(policy.walletId, policy);
@@ -64,6 +66,8 @@ export class PolicyEngine {
         return this.evaluateVelocity(rule as VelocityRule, opts);
       case "allowlist":
         return this.evaluateAllowlist(rule as AllowlistRule, opts);
+      case "session_key":
+        return this.evaluateSessionKey(rule as SessionKeyPolicyRule, opts);
       default:
         return { approved: true };
     }
@@ -159,6 +163,33 @@ export class PolicyEngine {
       return { approved: false, reason: `Destination ${destination} is not on the allowlist` };
     }
 
+    return { approved: true };
+  }
+
+  private evaluateSessionKey(rule: SessionKeyPolicyRule, opts: EvaluateOpts): EvaluateResult {
+    const now = Date.now();
+    const expiryMs = rule.expiresAt < 1e11 ? rule.expiresAt * 1000 : rule.expiresAt;
+
+    if (now > expiryMs) {
+      return { approved: false, reason: `Session key ${rule.sessionPublicKey} has expired` };
+    }
+
+    const paymentOp = opts.transaction.operations.find(
+      (op): op is Operation.Payment => "amount" in op && "destination" in op
+    ) as Operation.Payment | undefined;
+
+    const txAmount = paymentOp ? parseFloat(paymentOp.amount) : 0;
+    const currentSpend = this.sessionSpendTracking.get(rule.sessionPublicKey) ?? 0;
+    const maxSpend = parseFloat(rule.maxSpend);
+
+    if (currentSpend + txAmount > maxSpend) {
+      return {
+        approved: false,
+        reason: `Session key spend cap exceeded (${currentSpend + txAmount} > ${maxSpend})`,
+      };
+    }
+
+    this.sessionSpendTracking.set(rule.sessionPublicKey, currentSpend + txAmount);
     return { approved: true };
   }
 }

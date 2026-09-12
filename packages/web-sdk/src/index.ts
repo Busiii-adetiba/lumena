@@ -1,3 +1,3 @@
-export { LumenClient } from "./client.js";
-export type { LumenClientOpts } from "./client.js";
-export { Sep41Token } from "@lumen/core";
+export { LumenClient, createSessionKey } from "./client.js";
+export type { LumenClientOpts, SessionKeyInfo } from "./client.js";
+
