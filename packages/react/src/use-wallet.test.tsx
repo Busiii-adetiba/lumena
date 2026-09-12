@@ -71,4 +71,35 @@ describe("useWallet", () => {
     expect(result.current.wallet).toBe(secondWallet);
     expect(getWallet).toHaveBeenCalledTimes(2);
   });
+
+    it("refetches when the wallet ID changes", () => {
+    const walletOne = {} as ReturnType<LumenClient["getWallet"]>;
+    const walletTwo = {} as ReturnType<LumenClient["getWallet"]>;
+
+    const getWallet = vi
+      .fn()
+      .mockReturnValueOnce(walletOne)
+      .mockReturnValueOnce(walletTwo);
+
+    const client = { getWallet } as unknown as LumenClient;
+
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <LumenProvider client={client}>{children}</LumenProvider>
+    );
+
+    const { result, rerender } = renderHook(
+      ({ walletId }) => useWallet(walletId),
+      {
+        initialProps: { walletId: "wallet-1" },
+        wrapper,
+      }
+    );
+
+    expect(result.current.wallet).toBe(walletOne);
+
+    rerender({ walletId: "wallet-2" });
+
+    expect(result.current.wallet).toBe(walletTwo);
+    expect(getWallet).toHaveBeenLastCalledWith("wallet-2");
+  });
 });

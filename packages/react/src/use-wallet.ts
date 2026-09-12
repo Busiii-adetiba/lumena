@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { Wallet } from "@lumen/core";
 import { useLumen } from "./context.js";
 
@@ -11,9 +11,7 @@ export interface UseWalletResult {
 export function useWallet(walletId: string): UseWalletResult {
   const { client } = useLumen();
 
-  const [wallet, setWallet] = useState<Wallet | undefined>(() =>
-    client.getWallet(walletId)
-  );
+  const [wallet, setWallet] = useState<Wallet | undefined>();
   const [error, setError] = useState<Error | null>(null);
 
   const refetch = useCallback(() => {
@@ -26,6 +24,10 @@ export function useWallet(walletId: string): UseWalletResult {
       );
     }
   }, [client, walletId]);
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   return {
     wallet,
