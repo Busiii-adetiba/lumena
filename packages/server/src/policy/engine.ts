@@ -192,4 +192,4 @@ export class PolicyEngine {
     this.sessionSpendTracking.set(rule.sessionPublicKey, currentSpend + txAmount);
     return { approved: true };
   }
-}
+}
