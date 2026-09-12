@@ -5,7 +5,11 @@ export interface Policy {
   createdAt: Date;
 }
 
-export type PolicyRule = SpendLimit | VelocityRule | AllowlistRule;
+export type PolicyRule =
+  | SpendLimit
+  | VelocityRule
+  | AllowlistRule
+  | SessionKeyPolicyRule;
 
 export interface SpendLimit {
   type: "spend_limit";
@@ -24,3 +28,11 @@ export interface AllowlistRule {
   type: "allowlist";
   destinations: string[];
 }
+
+export interface SessionKeyPolicyRule {
+  type: "session_key";
+  sessionPublicKey: string;
+  maxSpend: string;
+  expiresAt: number;
+}
+
