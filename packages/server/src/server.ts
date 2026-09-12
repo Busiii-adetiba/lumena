@@ -16,6 +16,8 @@ import {
   FeeBumpRequestSchema,
   PolicyRequestSchema,
 } from "./validation.js";
+import swaggerUi from "swagger-ui-express";
+import { openApiSpec } from "./openapi.js";
 import {
   ValidationError,
   PolicyError,
@@ -73,6 +75,8 @@ export function createServer(opts: ServerOpts): ServerResult {
 
   const app = express();
   app.use(express.json());
+
+  app.use("/docs", swaggerUi.serve, swaggerUi.setup(openApiSpec));
 
   let activeRequests = 0;
 

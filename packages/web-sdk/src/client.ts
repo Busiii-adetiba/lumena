@@ -1,5 +1,5 @@
 import { Keypair, Asset } from "@stellar/stellar-sdk";
-import { StellarClient, Wallet, KNOWN_ASSETS } from "@lumen/core";
+import { StellarClient, Wallet, KNOWN_ASSETS, Sep41Token } from "@lumen/core";
 import type { StellarNetwork } from "@lumen/types";
 
 export interface LumenClientOpts {
@@ -24,6 +24,10 @@ export class LumenClient {
     });
     this.sponsorKeypair = Keypair.fromSecret(opts.sponsorSecret);
     this.serverPublicKey = opts.serverPublicKey;
+  }
+
+  getSep41Token(contractId: string): Sep41Token {
+    return new Sep41Token(this.client, contractId);
   }
 
   async createWallet(): Promise<{ address: string; id: string }> {
