@@ -7,12 +7,10 @@ import express, {
 import { createServer as createHttpServer, type Server as HttpServer } from "node:http";
 import { Keypair } from "@stellar/stellar-sdk";
 import { StellarClient } from "@lumen/core";
-import type { Signer, PolicyStore } from "@lumen/types";
+import type { Signer } from "@lumen/types";
 import { CosignerService } from "./cosigner/service.js";
 import { FeeSponsorService } from "./fee-sponsor/service.js";
 import { PolicyEngine } from "./policy/engine.js";
-import { apiKeyAuth } from "./middleware/auth.js";
-import { rateLimiter, type RateLimiterOpts } from "./middleware/rate-limit.js";
 import {
   CosignRequestSchema,
   FeeBumpRequestSchema,
@@ -25,12 +23,15 @@ import {
   wrapHandler,
 } from "./errors.js";
 
+import { SponsorMonitorService } from "./fee-sponsor/monitor.js";
+
 export interface ServerResult {
   app: Express;
   server: HttpServer;
   client: StellarClient;
   cosignerService: CosignerService;
   feeSponsorService: FeeSponsorService;
+  sponsorMonitorService: SponsorMonitorService;
   policyEngine: PolicyEngine;
 }
 
@@ -41,26 +42,16 @@ export interface ServerOpts {
   rpcUrl?: string;
   /**
    * Signer used by the co-signer service.
-   * Dev/testnet → EnvSigner. Production → AwsKmsSigner or equivalent.
+   * Dev/testnet → EnvSigner.  Production → AwsKmsSigner or equivalent.
    */
   cosignerSigner: Signer;
   /**
    * Signer used by the fee-sponsor service.
-   * Dev/testnet → EnvSigner. Production → AwsKmsSigner or equivalent.
+   * Dev/testnet → EnvSigner.  Production → AwsKmsSigner or equivalent.
    */
   feePayerSigner: Signer;
-  /**
-   * Optional custom PolicyStore driver (e.g. RedisPolicyStore).
-   */
-  policyStore?: PolicyStore;
-  /**
-   * Optional API Key for authentication middleware.
-   */
-  apiKey?: string;
-  /**
-   * Optional rate limiter configuration.
-   */
-  rateLimitOpts?: RateLimiterOpts;
+  minSponsorBalance?: number;
+  sponsorPollIntervalMs?: number;
 }
 
 export function createServer(opts: ServerOpts): ServerResult {
@@ -72,7 +63,7 @@ export function createServer(opts: ServerOpts): ServerResult {
     rpcUrl: opts.rpcUrl,
   });
 
-  const policyEngine = new PolicyEngine({ store: opts.policyStore });
+  const policyEngine = new PolicyEngine();
 
   const cosignerService = new CosignerService({
     client,
@@ -85,10 +76,15 @@ export function createServer(opts: ServerOpts): ServerResult {
     signer: opts.feePayerSigner,
   });
 
+  const sponsorMonitorService = new SponsorMonitorService({
+    client,
+    sponsorPublicKey: opts.feePayerSigner.publicKey(),
+    minBalanceXlm: opts.minSponsorBalance,
+    pollIntervalMs: opts.sponsorPollIntervalMs,
+  });
+
   const app = express();
   app.use(express.json());
-  app.use(rateLimiter(opts.rateLimitOpts));
-  app.use(apiKeyAuth({ apiKey: opts.apiKey }));
 
   let activeRequests = 0;
 
@@ -103,6 +99,11 @@ export function createServer(opts: ServerOpts): ServerResult {
   app.get("/health", (_req, res) => {
     res.json({ status: "ok", network: client.config.network });
   });
+
+  app.get("/sponsor/status", wrapHandler(async (_req: Request, res: Response) => {
+    const status = await sponsorMonitorService.checkBalance();
+    res.json(status);
+  }));
 
   app.post("/cosign", wrapHandler(async (req: Request, res: Response) => {
     const parsed = CosignRequestSchema.safeParse(req.body);
@@ -139,13 +140,13 @@ export function createServer(opts: ServerOpts): ServerResult {
     res.json(result);
   }));
 
-  app.get("/policy/:walletId", wrapHandler(async (req: Request, res: Response) => {
-    const policy = await policyEngine.getPolicy(req.params.walletId as string);
+  app.get("/policy/:walletId", (req: Request, res: Response) => {
+    const policy = policyEngine.getPolicy(req.params.walletId as string);
     if (!policy) {
       throw new PolicyError("No policy found", 404);
     }
     res.json(policy);
-  }));
+  });
 
   app.post("/policy", wrapHandler(async (req: Request, res: Response) => {
     const parsed = PolicyRequestSchema.safeParse(req.body);
@@ -160,7 +161,7 @@ export function createServer(opts: ServerOpts): ServerResult {
       createdAt: new Date(),
     };
 
-    await policyEngine.addPolicy(policy);
+    policyEngine.addPolicy(policy);
     res.json(policy);
   }));
 
@@ -193,6 +194,7 @@ export function createServer(opts: ServerOpts): ServerResult {
 
   const gracefulShutdown = (signal: string) => {
     console.log(`${signal} received, shutting down gracefully`);
+    sponsorMonitorService.stop();
 
     server.close(() => {
       console.log("HTTP server closed");
@@ -219,5 +221,13 @@ export function createServer(opts: ServerOpts): ServerResult {
   process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
   process.on("SIGINT", () => gracefulShutdown("SIGINT"));
 
-  return { app, server, client, cosignerService, feeSponsorService, policyEngine };
+  return {
+    app,
+    server,
+    client,
+    cosignerService,
+    feeSponsorService,
+    sponsorMonitorService,
+    policyEngine,
+  };
 }

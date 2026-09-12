@@ -1,13 +1,12 @@
-import { Transaction, Asset } from "@stellar/stellar-sdk";
+import { Transaction, Operation } from "@stellar/stellar-sdk";
 import type {
   Policy,
   PolicyRule,
   SpendLimit,
   VelocityRule,
   AllowlistRule,
-  PolicyStore,
+  SessionKeyPolicyRule,
 } from "@lumen/types";
-import { InMemoryPolicyStore } from "./store.js";
 
 export interface EvaluateOpts {
   walletAddress: string;
@@ -19,96 +18,38 @@ export interface EvaluateResult {
   reason?: string;
 }
 
-export interface PolicyEngineOpts {
-  store?: PolicyStore;
-}
-
-interface ExtractedOperation {
-  destination: string;
-  amount: number;
-  asset: string;
-}
-
-export function normalizeAssetKey(asset: Asset | string | undefined | null): string {
-  if (!asset) return "native";
-  if (typeof asset === "string") {
-    const upper = asset.toUpperCase();
-    if (upper === "NATIVE" || upper === "XLM") {
-      return "native";
-    }
-    return asset;
-  }
-  if (typeof asset.isNative === "function" && asset.isNative()) {
-    return "native";
-  }
-  if (typeof asset.getCode === "function" && typeof asset.getIssuer === "function") {
-    return `${asset.getCode()}:${asset.getIssuer()}`;
-  }
-  return "native";
-}
-
-export function extractPaymentOps(transaction: Transaction): ExtractedOperation[] {
-  const extracted: ExtractedOperation[] = [];
-  if (!transaction || !Array.isArray(transaction.operations)) {
-    return extracted;
-  }
-
-  for (const op of transaction.operations) {
-    const opAny = op as any;
-    const type = opAny.type;
-
-    if (type === "payment" || ("amount" in opAny && "destination" in opAny && !type)) {
-      extracted.push({
-        destination: opAny.destination,
-        amount: parseFloat(opAny.amount || "0"),
-        asset: normalizeAssetKey(opAny.asset),
-      });
-    } else if (type === "pathPaymentStrictSend") {
-      extracted.push({
-        destination: opAny.destination,
-        amount: parseFloat(opAny.sendAmount || "0"),
-        asset: normalizeAssetKey(opAny.sendAsset),
-      });
-    } else if (type === "pathPaymentStrictReceive") {
-      extracted.push({
-        destination: opAny.destination,
-        amount: parseFloat(opAny.sendMax || "0"),
-        asset: normalizeAssetKey(opAny.sendAsset),
-      });
-    }
-  }
-
-  return extracted;
-}
-
 export class PolicyEngine {
-  private store: PolicyStore;
+  private policies: Map<string, Policy> = new Map();
 
-  constructor(opts?: PolicyEngineOpts) {
-    this.store = opts?.store ?? new InMemoryPolicyStore();
+  // In-memory tracking for spend limit and velocity
+  private readonly spendTracking: Map<string, Map<string, { dailyTotal: number; txCount: number }>> =
+    new Map();
+  private readonly velocityTracking: Map<string, number[]> = new Map();
+  private readonly sessionSpendTracking: Map<string, number> = new Map();
+
+  addPolicy(policy: Policy): void {
+    this.policies.set(policy.walletId, policy);
   }
 
-  async addPolicy(policy: Policy): Promise<void> {
-    await this.store.savePolicy(policy);
+  removePolicy(walletId: string): void {
+    this.policies.delete(walletId);
+    this.spendTracking.delete(walletId);
+    this.velocityTracking.delete(walletId);
   }
 
-  async removePolicy(walletId: string): Promise<void> {
-    await this.store.deletePolicy(walletId);
+  getPolicy(walletId: string): Policy | undefined {
+    return this.policies.get(walletId);
   }
 
-  async getPolicy(walletId: string): Promise<Policy | null> {
-    return await this.store.getPolicy(walletId);
-  }
-
-  async evaluate(opts: EvaluateOpts): Promise<EvaluateResult> {
-    const policy = await this.store.getPolicy(opts.walletAddress);
+  evaluate(opts: EvaluateOpts): EvaluateResult {
+    const policy = this.policies.get(opts.walletAddress);
 
     if (!policy) {
       return { approved: true };
     }
 
     for (const rule of policy.rules) {
-      const result = await this.evaluateRule(rule, opts);
+      const result = this.evaluateRule(rule, opts);
       if (!result.approved) {
         return result;
       }
@@ -117,111 +58,138 @@ export class PolicyEngine {
     return { approved: true };
   }
 
-  private async evaluateRule(
-    rule: PolicyRule,
-    opts: EvaluateOpts
-  ): Promise<EvaluateResult> {
+  private evaluateRule(rule: PolicyRule, opts: EvaluateOpts): EvaluateResult {
     switch (rule.type) {
       case "spend_limit":
-        return await this.evaluateSpendLimit(rule as SpendLimit, opts);
+        return this.evaluateSpendLimit(rule as SpendLimit, opts);
       case "velocity":
-        return await this.evaluateVelocity(rule as VelocityRule, opts);
+        return this.evaluateVelocity(rule as VelocityRule, opts);
       case "allowlist":
-        return await this.evaluateAllowlist(rule as AllowlistRule, opts);
+        return this.evaluateAllowlist(rule as AllowlistRule, opts);
+      case "session_key":
+        return this.evaluateSessionKey(rule as SessionKeyPolicyRule, opts);
       default:
         return { approved: true };
     }
   }
 
-  private async evaluateSpendLimit(
-    rule: SpendLimit,
-    opts: EvaluateOpts
-  ): Promise<EvaluateResult> {
+  private evaluateSpendLimit(rule: SpendLimit, opts: EvaluateOpts): EvaluateResult {
     const { walletAddress } = opts;
-    const ops = extractPaymentOps(opts.transaction);
 
-    const ruleAssetKey = normalizeAssetKey(rule.asset);
+    // Get the first payment operation from the transaction
+    const paymentOp = opts.transaction.operations.find(
+      (op): op is Operation.Payment => "amount" in op && "destination" in op
+    ) as Operation.Payment | undefined;
 
-    const matchingOps = ops.filter((op) => op.asset === ruleAssetKey);
-
-    if (matchingOps.length === 0) {
-      return { approved: true };
+    if (!paymentOp) {
+      return { approved: true }; // No payment operation, skip spend limit check
     }
 
-    let totalTxAmount = 0;
-    const maxPerTx = parseFloat(rule.maxPerTx);
+    const txAmount = parseFloat(paymentOp.amount);
 
-    for (const op of matchingOps) {
-      if (op.amount > maxPerTx) {
-        return {
-          approved: false,
-          reason: `Transaction amount ${op.amount} exceeds per-tx limit ${rule.maxPerTx}`,
-        };
-      }
-      totalTxAmount += op.amount;
+    // Initialize tracking for this wallet if needed
+    if (!this.spendTracking.has(walletAddress)) {
+      this.spendTracking.set(walletAddress, new Map());
     }
-
+    const walletTrack = this.spendTracking.get(walletAddress)!;
     const today = new Date().toISOString().split("T")[0];
-    const track = await this.store.recordSpend(
-      walletAddress,
-      today,
-      totalTxAmount,
-      ruleAssetKey
-    );
+
+    if (!walletTrack.has(today)) {
+      walletTrack.set(today, { dailyTotal: 0, txCount: 0 });
+    }
+    const track = walletTrack.get(today)!;
+
+    // Check per-transaction limit
+    if (txAmount > parseFloat(rule.maxPerTx)) {
+      return { approved: false, reason: `Transaction amount ${txAmount} exceeds per-tx limit ${rule.maxPerTx}` };
+    }
+
+    // Check daily limit
+    track.dailyTotal += txAmount;
+    track.txCount++;
 
     if (track.dailyTotal > parseFloat(rule.maxDaily)) {
-      return {
-        approved: false,
-        reason: `Daily spending ${track.dailyTotal} exceeds limit ${rule.maxDaily}`,
-      };
+      return { approved: false, reason: `Daily spending ${track.dailyTotal} exceeds limit ${rule.maxDaily}` };
     }
 
     return { approved: true };
   }
 
-  private async evaluateVelocity(
-    rule: VelocityRule,
-    opts: EvaluateOpts
-  ): Promise<EvaluateResult> {
+  private evaluateVelocity(rule: VelocityRule, opts: EvaluateOpts): EvaluateResult {
     const { walletAddress } = opts;
+
+    // Initialize tracking for this wallet if needed
+    if (!this.velocityTracking.has(walletAddress)) {
+      this.velocityTracking.set(walletAddress, []);
+    }
+    const txTimes = this.velocityTracking.get(walletAddress)!;
+
+    // Remove timestamps outside the window
     const windowMs = rule.windowMinutes * 60 * 1000;
+    const cutoff = Date.now() - windowMs;
+    const recentTxs = txTimes.filter((t) => t > cutoff);
 
-    const count = await this.store.recordVelocity(
-      walletAddress,
-      Date.now(),
-      windowMs
-    );
+    // Add current transaction timestamp
+    recentTxs.push(Date.now());
 
-    if (count > rule.maxTransactions) {
+    // Update tracking
+    this.velocityTracking.set(walletAddress, recentTxs);
+
+    // Check if exceeding limit
+    if (recentTxs.length > rule.maxTransactions) {
       return {
         approved: false,
-        reason: `Too many transactions (${count}) in ${rule.windowMinutes}-minute window (max: ${rule.maxTransactions})`,
+        reason: `Too many transactions (${recentTxs.length}) in ${rule.windowMinutes}-minute window (max: ${rule.maxTransactions})`,
       };
     }
 
     return { approved: true };
   }
 
-  private async evaluateAllowlist(
-    rule: AllowlistRule,
-    opts: EvaluateOpts
-  ): Promise<EvaluateResult> {
-    const ops = extractPaymentOps(opts.transaction);
+  private evaluateAllowlist(rule: AllowlistRule, opts: EvaluateOpts): EvaluateResult {
+    // Get the first payment operation's destination from the transaction
+    const paymentOp = opts.transaction.operations.find(
+      (op): op is Operation.Payment => "amount" in op && "destination" in op
+    ) as Operation.Payment | undefined;
 
-    if (ops.length === 0) {
-      return { approved: true };
+    if (!paymentOp) {
+      return { approved: true }; // No payment operation, skip allowlist check
     }
 
-    for (const op of ops) {
-      const allowed = rule.destinations.includes(op.destination);
-      if (!allowed) {
-        return {
-          approved: false,
-          reason: `Destination ${op.destination} is not on the allowlist`,
-        };
-      }
+    const destination = paymentOp.destination.toString();
+    const allowed = rule.destinations.includes(destination);
+
+    if (!allowed) {
+      return { approved: false, reason: `Destination ${destination} is not on the allowlist` };
     }
 
+    return { approved: true };
+  }
+
+  private evaluateSessionKey(rule: SessionKeyPolicyRule, opts: EvaluateOpts): EvaluateResult {
+    const now = Date.now();
+    const expiryMs = rule.expiresAt < 1e11 ? rule.expiresAt * 1000 : rule.expiresAt;
+
+    if (now > expiryMs) {
+      return { approved: false, reason: `Session key ${rule.sessionPublicKey} has expired` };
+    }
+
+    const paymentOp = opts.transaction.operations.find(
+      (op): op is Operation.Payment => "amount" in op && "destination" in op
+    ) as Operation.Payment | undefined;
+
+    const txAmount = paymentOp ? parseFloat(paymentOp.amount) : 0;
+    const currentSpend = this.sessionSpendTracking.get(rule.sessionPublicKey) ?? 0;
+    const maxSpend = parseFloat(rule.maxSpend);
+
+    if (currentSpend + txAmount > maxSpend) {
+      return {
+        approved: false,
+        reason: `Session key spend cap exceeded (${currentSpend + txAmount} > ${maxSpend})`,
+      };
+    }
+
+    this.sessionSpendTracking.set(rule.sessionPublicKey, currentSpend + txAmount);
     return { approved: true };
   }
 }
