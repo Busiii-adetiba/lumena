@@ -1,5 +1,5 @@
 import { Keypair, Asset } from "@stellar/stellar-sdk";
-import { StellarClient, Wallet, KNOWN_ASSETS } from "@lumen/core";
+import { StellarClient, Wallet, KNOWN_ASSETS, Sep41Token } from "@lumen/core";
 import type { StellarNetwork } from "@lumen/types";
 
 export interface LumenClientOpts {
