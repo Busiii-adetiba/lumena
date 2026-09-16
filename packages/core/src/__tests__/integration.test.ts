@@ -10,6 +10,17 @@ import { Wallet } from "../wallet/wallet.js";
 const HORIZON_URL = process.env.HORIZON_URL ?? "http://localhost:8000";
 const RPC_URL = process.env.RPC_URL ?? "http://localhost:8000";
 
+async function isLocalNetworkAvailable(): Promise<boolean> {
+  try {
+    const res = await fetch(HORIZON_URL, { signal: AbortSignal.timeout(1000) });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+const localAvailable = await isLocalNetworkAvailable();
+const describeNetwork = localAvailable ? describe : describe.skip;
+
 function getClient() {
   return new StellarClient({
     network: "local",
@@ -33,7 +44,7 @@ describe("StellarClient", () => {
   });
 });
 
-describe("createSponsoredAccount", () => {
+describeNetwork("createSponsoredAccount", () => {
   const client = getClient();
 
   it("creates a new account with sponsor paying reserves", async () => {
@@ -58,7 +69,7 @@ describe("createSponsoredAccount", () => {
   });
 });
 
-describe("setupMultisig", () => {
+describeNetwork("setupMultisig", () => {
   const client = getClient();
 
   it("adds a co-signer with 2-of-2 threshold", async () => {
@@ -96,7 +107,7 @@ describe("setupMultisig", () => {
   });
 });
 
-describe("buildFeeBump", () => {
+describeNetwork("buildFeeBump", () => {
   const client = getClient();
 
   it("wraps a transaction in a fee-bump", async () => {
@@ -176,7 +187,7 @@ describe("KeyManager", () => {
   });
 });
 
-describe("Wallet", () => {
+describeNetwork("Wallet", () => {
   const client = getClient();
 
   it("creates a wallet with sponsored account and multisig", async () => {
