@@ -4,7 +4,7 @@ import express, {
   type Response,
   type NextFunction,
 } from "express";
-import { createServer as createHttpServer, type Server as HttpServer } from "node:http";
+import { createServer as createHttpServer, type Server as HttpServer, type RequestListener, type IncomingMessage } from "node:http";
 import { Keypair } from "@stellar/stellar-sdk";
 import { StellarClient } from "@lumen/core";
 import type { Signer } from "@lumen/types";
@@ -93,7 +93,9 @@ export function createServer(opts: ServerOpts): ServerResult {
   });
 
   const app = express();
-  app.use(httpLogger);
+  app.use((req, res, next) => {
+    httpLogger(req as unknown as IncomingMessage, res, next);
+  });
   app.use(express.json());
 
   app.use((req: Request, res: Response, next: NextFunction) => {
@@ -118,7 +120,7 @@ export function createServer(opts: ServerOpts): ServerResult {
   app.get("/health", wrapHandler(async (_req, res) => {
     let horizonConnected = false;
     try {
-      await client.horizon.server.fetchTime();
+      await client.horizon.root();
       horizonConnected = true;
     } catch {
       horizonConnected = false;
@@ -235,7 +237,7 @@ export function createServer(opts: ServerOpts): ServerResult {
 
   app.use(errorHandler);
 
-  const server = createHttpServer(app);
+  const server = createHttpServer(app as unknown as RequestListener);
 
   server.listen(port, () => {
     logger.info({ port, network: client.config.network }, `Lumen server listening on port ${port}`);
