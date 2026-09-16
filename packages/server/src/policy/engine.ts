@@ -1,4 +1,4 @@
-import { Transaction, Operation } from "@stellar/stellar-sdk";
+import type { Transaction, Operation } from "@stellar/stellar-sdk";
 import type {
   Policy,
   PolicyRule,
@@ -37,8 +37,8 @@ export class PolicyEngine {
     this.velocityTracking.delete(walletId);
   }
 
-  getPolicy(walletId: string): Policy | undefined {
-    return this.policies.get(walletId);
+  getPolicy(walletId: string): Policy | null {
+    return this.policies.get(walletId) ?? null;
   }
 
   evaluate(opts: EvaluateOpts): EvaluateResult {
@@ -75,17 +75,24 @@ export class PolicyEngine {
 
   private evaluateSpendLimit(rule: SpendLimit, opts: EvaluateOpts): EvaluateResult {
     const { walletAddress } = opts;
+    const targetAsset = this.getAssetIdentifier(rule.asset);
 
-    // Get the first payment operation from the transaction
-    const paymentOp = opts.transaction.operations.find(
-      (op): op is Operation.Payment => "amount" in op && "destination" in op
-    ) as Operation.Payment | undefined;
+    let txAmount = 0;
+    let matchedOps = 0;
 
-    if (!paymentOp) {
-      return { approved: true }; // No payment operation, skip spend limit check
+    for (const op of opts.transaction.operations) {
+      if ("amount" in op && typeof (op as any).amount === "string") {
+        const opAsset = "asset" in op ? this.getAssetIdentifier((op as any).asset) : "native";
+        if (opAsset === targetAsset) {
+          txAmount += parseFloat((op as any).amount);
+          matchedOps++;
+        }
+      }
     }
 
-    const txAmount = parseFloat(paymentOp.amount);
+    if (matchedOps === 0) {
+      return { approved: true };
+    }
 
     // Initialize tracking for this wallet if needed
     if (!this.spendTracking.has(walletAddress)) {
@@ -93,11 +100,12 @@ export class PolicyEngine {
     }
     const walletTrack = this.spendTracking.get(walletAddress)!;
     const today = new Date().toISOString().split("T")[0];
+    const trackKey = `${today}:${targetAsset}`;
 
-    if (!walletTrack.has(today)) {
-      walletTrack.set(today, { dailyTotal: 0, txCount: 0 });
+    if (!walletTrack.has(trackKey)) {
+      walletTrack.set(trackKey, { dailyTotal: 0, txCount: 0 });
     }
-    const track = walletTrack.get(today)!;
+    const track = walletTrack.get(trackKey)!;
 
     // Check per-transaction limit
     if (txAmount > parseFloat(rule.maxPerTx)) {
@@ -113,6 +121,26 @@ export class PolicyEngine {
     }
 
     return { approved: true };
+  }
+
+  private getAssetIdentifier(asset: any): string {
+    if (!asset) return "native";
+    if (typeof asset === "string") {
+      if (asset.toLowerCase() === "native" || asset.toUpperCase() === "XLM") {
+        return "native";
+      }
+      return asset;
+    }
+    if (typeof asset.isNative === "function" && asset.isNative()) {
+      return "native";
+    }
+    if (asset.code && asset.issuer) {
+      return `${asset.code}:${asset.issuer}`;
+    }
+    if (asset.code) {
+      return asset.code;
+    }
+    return "native";
   }
 
   private evaluateVelocity(rule: VelocityRule, opts: EvaluateOpts): EvaluateResult {
@@ -147,20 +175,16 @@ export class PolicyEngine {
   }
 
   private evaluateAllowlist(rule: AllowlistRule, opts: EvaluateOpts): EvaluateResult {
-    // Get the first payment operation's destination from the transaction
-    const paymentOp = opts.transaction.operations.find(
-      (op): op is Operation.Payment => "amount" in op && "destination" in op
-    ) as Operation.Payment | undefined;
-
-    if (!paymentOp) {
-      return { approved: true }; // No payment operation, skip allowlist check
-    }
-
-    const destination = paymentOp.destination.toString();
-    const allowed = rule.destinations.includes(destination);
-
-    if (!allowed) {
-      return { approved: false, reason: `Destination ${destination} is not on the allowlist` };
+    for (const op of opts.transaction.operations) {
+      if ("destination" in op && op.destination) {
+        const destination = op.destination.toString();
+        if (!rule.destinations.includes(destination)) {
+          return {
+            approved: false,
+            reason: `Destination ${destination} is not on the allowlist`,
+          };
+        }
+      }
     }
 
     return { approved: true };
