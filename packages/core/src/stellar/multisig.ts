@@ -1,5 +1,6 @@
+import type {
+  Keypair} from "@stellar/stellar-sdk";
 import {
-  Keypair,
   TransactionBuilder,
   Operation,
   BASE_FEE,
