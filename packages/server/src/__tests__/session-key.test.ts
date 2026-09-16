@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Keypair, TransactionBuilder, Operation, Asset, BASE_FEE } from "@stellar/stellar-sdk";
+import { Keypair } from "@stellar/stellar-sdk";
 import { PolicyEngine } from "../policy/engine.js";
 import type { SessionKeyPolicyRule } from "@lumen/types";
 
