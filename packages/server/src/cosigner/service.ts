@@ -1,7 +1,7 @@
 import { TransactionBuilder, Transaction, Keypair } from "@stellar/stellar-sdk";
 import type { Signer } from "@lumen/types";
 import type { StellarClient } from "@lumen/core";
-import { PolicyEngine } from "../policy/engine.js";
+import type { PolicyEngine } from "../policy/engine.js";
 
 export interface CosignerOpts {
   client: StellarClient;

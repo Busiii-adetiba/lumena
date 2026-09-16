@@ -5,10 +5,10 @@ export class ValidationError extends Error {
   statusCode: number;
   details?: unknown;
 
-  constructor(message: string, details?: unknown) {
+  constructor(message: string, details?: unknown, statusCode = 400) {
     super(message);
     this.name = "ValidationError";
-    this.statusCode = 400;
+    this.statusCode = statusCode;
     this.details = details;
   }
 }

@@ -3,10 +3,8 @@ import {
   StellarClient,
   Wallet,
   KNOWN_ASSETS,
-  Sep41Token,
   PasskeyManager,
   type PasskeyRegistrationOpts,
-  type PasskeyAssertionOpts,
 } from "@lumen/core";
 import type { StellarNetwork } from "@lumen/types";
 

@@ -1,10 +1,11 @@
-import {
+import type {
   Keypair,
+  Asset,
+} from "@stellar/stellar-sdk";
+import {
   TransactionBuilder,
   Operation,
-  Asset,
   BASE_FEE,
-  Horizon,
 } from "@stellar/stellar-sdk";
 import type { StellarClient } from "./client.js";
 
