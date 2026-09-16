@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Lumen Documentation
+    url: https://github.com/utilityjnr1/lumena/tree/main/docs
+    about: Please check our documentation for API and architecture guides.
+  - name: Development Roadmap & Issues Directory
+    url: https://github.com/utilityjnr1/lumena/blob/main/ISSUES.md
+    about: Explore open issues and tasks on our roadmap.
