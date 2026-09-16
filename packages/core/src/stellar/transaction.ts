@@ -1,8 +1,9 @@
-import {
+import type {
   Keypair,
-  TransactionBuilder,
   Transaction,
-  FeeBumpTransaction,
+  FeeBumpTransaction} from "@stellar/stellar-sdk";
+import {
+  TransactionBuilder
 } from "@stellar/stellar-sdk";
 
 export interface BuildFeeBumpOpts {
