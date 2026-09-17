@@ -15,7 +15,7 @@
     "lint": "eslint src/"
   },
   "dependencies": {
-    "commander": "^12.0.0",
+    "commander": "^15.0.0",
     "@lumen/core": "workspace:*",
     "@lumen/types": "workspace:*",
     "@stellar/stellar-sdk": "^16.0.1"
