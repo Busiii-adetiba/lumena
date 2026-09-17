@@ -18,6 +18,25 @@ function getClient() {
   });
 }
 
+const client = getClient();
+
+async function fundAccount(pubkey: string) {
+  try {
+    const res = await fetch(`${HORIZON_URL}/friendbot?addr=${pubkey}`);
+    await res.json().catch(() => {});
+  } catch {
+    await client.rpc.requestAirdrop(pubkey);
+  }
+  for (let i = 0; i < 30; i++) {
+    try {
+      await client.horizon.loadAccount(pubkey);
+      return;
+    } catch {
+      await new Promise((r) => setTimeout(r, 500));
+    }
+  }
+}
+
 describe("StellarClient", () => {
   const client = getClient();
 
@@ -41,7 +60,7 @@ describe("createSponsoredAccount", () => {
     const newAccount = Keypair.random();
 
     // Fund sponsor on local network
-    await client.rpc.requestAirdrop(sponsor.publicKey());
+    await fundAccount(sponsor.publicKey());
 
     const result = await createSponsoredAccount({
       client,
@@ -66,7 +85,7 @@ describe("setupMultisig", () => {
     const account = Keypair.random();
     const coSigner = Keypair.random();
 
-    await client.rpc.requestAirdrop(sponsor.publicKey());
+    await fundAccount(sponsor.publicKey());
 
     // Create account
     await createSponsoredAccount({
@@ -104,8 +123,8 @@ describe("buildFeeBump", () => {
     const source = Keypair.random();
     const destination = Keypair.random();
 
-    await client.rpc.requestAirdrop(sponsor.publicKey());
-    await client.rpc.requestAirdrop(destination.publicKey());
+    await fundAccount(sponsor.publicKey());
+    await fundAccount(destination.publicKey());
     await createSponsoredAccount({
       client,
       sponsorKeypair: sponsor,
@@ -184,7 +203,7 @@ describe("Wallet", () => {
     const sponsor = Keypair.random();
     const coSigner = Keypair.random();
 
-    await client.rpc.requestAirdrop(sponsor.publicKey());
+    await fundAccount(sponsor.publicKey());
 
     const wallet = new Wallet({
       client,
