@@ -16,7 +16,7 @@
     "@aws-sdk/client-kms": "^3.1133.0",
     "@lumen/core": "workspace:*",
     "@lumen/types": "workspace:*",
-    "@stellar/stellar-sdk": "^16.0.1",
+    "@stellar/stellar-sdk": "^17.0.1",
     "express": "^5.1.0",
     "pino": "^10.3.1",
     "pino-http": "^10.4.0",
