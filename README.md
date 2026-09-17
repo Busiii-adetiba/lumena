@@ -30,9 +30,11 @@ Lumen is a wallet SDK for building non-custodial Stellar wallets where the user 
 | **Seedless onboarding** | Users create a wallet in seconds — no seed phrase, no key management. |
 | **Gasless UX** | The server fee-bumps every transaction so users never hold XLM for fees. |
 | **2-of-2 multisig** | Every wallet is a 2-of-2 account: the user signs with their device key, the server co-signs after policy. |
-| **Policy-controlled** | Spend limits, velocity rules, and destination allowlists enforced on-chain before co-signing. |
-| **Sponsorship** | The server pays XLM reserves for account creation and transaction fees. |
-| **Hardware-backed signing** | `Signer` abstraction supports AWS KMS, CloudHSM, and HashiCorp Vault for production. |
+| **Policy-controlled** | Spend limits, velocity rules, allowlists, and timebounds expiration enforced on-chain before co-signing. |
+| **Sponsorship** | The server pays XLM reserves for account creation and transaction fees with real-time balance monitoring. |
+| **Hardware-backed signing** | `Signer` abstraction supports AWS KMS, Google Cloud KMS, and HashiCorp Vault Transit engine. |
+| **Webhooks dispatcher** | Event notification dispatcher with HMAC SHA-256 signatures and exponential backoff retries. |
+| **Soroban smart contracts** | Generalized contract invocation, simulation, ScVal conversions, and SEP-41 token helpers. |
 
 ---
 
@@ -111,13 +113,15 @@ pnpm --filter @lumen/server dev
 ---
 
 ## Packages
-
-| Package | Description |
-| --- | --- |
-| **`@lumen/core`** | `StellarClient`, `createSponsoredAccount`, `setupMultisig`, `buildFeeBump`, `pathPayment`, `KeyManager`, `Wallet` |
-| **`@lumen/server`** | `CosignerService`, `FeeSponsorService`, `PolicyEngine`, Express API |
-| **`@lumen/web-sdk`** | `LumenClient`: `createWallet`, `getBalance`, `sendPayment` |
-| **`@lumen/types`** | Shared TypeScript interfaces |
+ 
+ | Package | Description |
+ | --- | --- |
+ | **`@lumen/core`** | `StellarClient`, `createSponsoredAccount`, `setupMultisig`, `buildFeeBump`, `KeyManager`, `Wallet`, `ContractClient`, ScVal helpers |
+ | **`@lumen/server`** | `CosignerService`, `FeeSponsorService`, `PolicyEngine`, `WebhookDispatcher`, KMS/Vault signers, Express API |
+ | **`@lumen/web-sdk`** | `LumenClient`: `createWallet`, `getBalance`, `sendPayment`, `invokeContract` |
+ | **`@lumen/react`** | React Context Provider and custom hooks (`useWallet`, `useBalance`, `useSendPayment`) |
+ | **`@lumen/cli`** | Administrative command-line tool for wallet inspection and sponsor operations |
+ | **`@lumen/types`** | Shared TypeScript interfaces for Stellar, policy, KMS, webhooks, and Soroban |
 
 ---
 
