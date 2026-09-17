@@ -1,5 +1,6 @@
 # Lumen
 
+[![CI](https://github.com/utilityjnr1/lumena/actions/workflows/ci.yml/badge.svg)](https://github.com/utilityjnr1/lumena/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Network](https://img.shields.io/badge/network-Stellar-orange.svg)](https://stellar.org)
 [![Runtime](https://img.shields.io/badge/runtime-TypeScript%20%2B%20Node-blue.svg)](https://nodejs.org)
@@ -136,4 +137,4 @@ See [ISSUES.md](ISSUES.md) for full details on how to fork the repo and submit p
 
 ## License
 
-MIT
+MIT
