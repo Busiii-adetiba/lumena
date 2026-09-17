@@ -10,14 +10,24 @@ import { logger } from "../logger.js";
 export interface WebhookDispatcherOpts {
   webhooks?: WebhookConfig[];
   timeoutMs?: number;
+  maxRetries?: number;
+  initialDelayMs?: number;
+  backoffFactor?: number;
 }
 
 export class WebhookDispatcher {
   private webhooks: Map<string, WebhookConfig> = new Map();
   private timeoutMs: number;
+  private maxRetries: number;
+  private initialDelayMs: number;
+  private backoffFactor: number;
 
   constructor(opts: WebhookDispatcherOpts = {}) {
     this.timeoutMs = opts.timeoutMs ?? 5000;
+    this.maxRetries = opts.maxRetries ?? 3;
+    this.initialDelayMs = opts.initialDelayMs ?? 200;
+    this.backoffFactor = opts.backoffFactor ?? 2;
+
     if (opts.webhooks) {
       for (const wh of opts.webhooks) {
         this.register(wh);
@@ -59,6 +69,10 @@ export class WebhookDispatcher {
     };
   }
 
+  private sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
   async dispatch<T>(event: WebhookEventType, data: T): Promise<WebhookDeliveryResult[]> {
     const matchingWebhooks = Array.from(this.webhooks.values()).filter(
       (wh) => wh.enabled !== false && (wh.events.includes(event) || wh.events.includes("*"))
@@ -73,47 +87,69 @@ export class WebhookDispatcher {
 
     const deliveryPromises = matchingWebhooks.map(async (wh) => {
       const signature = this.generateSignature(body, wh.secret);
+      let attempts = 0;
+      let lastStatusCode: number | undefined;
+      let lastError: string | undefined;
+      let success = false;
 
-      try {
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), this.timeoutMs);
+      while (attempts <= this.maxRetries) {
+        attempts++;
+        try {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), this.timeoutMs);
 
-        const res = await fetch(wh.url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Lumen-Signature": signature,
-            "X-Lumen-Event": event,
-            "X-Lumen-Delivery": payload.id,
-          },
-          body,
-          signal: controller.signal,
-        });
+          const res = await fetch(wh.url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Lumen-Signature": signature,
+              "X-Lumen-Event": event,
+              "X-Lumen-Delivery": payload.id,
+            },
+            body,
+            signal: controller.signal,
+          });
 
-        clearTimeout(timer);
+          clearTimeout(timer);
+          lastStatusCode = res.status;
 
-        const success = res.ok;
-        if (!success) {
-          logger.warn({ webhookId: wh.id, status: res.status }, "Webhook delivery returned non-2xx status");
+          if (res.ok) {
+            success = true;
+            break;
+          }
+
+          // If client error (other than 429 Too Many Requests), do not retry
+          if (res.status >= 400 && res.status < 500 && res.status !== 429) {
+            lastError = `HTTP ${res.status}: ${res.statusText}`;
+            break;
+          }
+
+          lastError = `HTTP ${res.status}: ${res.statusText}`;
+        } catch (err: any) {
+          lastError = err.message;
         }
 
-        return {
-          webhookId: wh.id,
-          url: wh.url,
-          success,
-          statusCode: res.status,
-          attempts: 1,
-        } as WebhookDeliveryResult;
-      } catch (err: any) {
-        logger.error({ webhookId: wh.id, err: err.message }, "Webhook delivery failed");
-        return {
-          webhookId: wh.id,
-          url: wh.url,
-          success: false,
-          attempts: 1,
-          error: err.message,
-        } as WebhookDeliveryResult;
+        if (attempts <= this.maxRetries) {
+          const delay = this.initialDelayMs * Math.pow(this.backoffFactor, attempts - 1);
+          await this.sleep(delay);
+        }
       }
+
+      if (!success) {
+        logger.warn(
+          { webhookId: wh.id, attempts, error: lastError },
+          "Webhook delivery failed after attempts"
+        );
+      }
+
+      return {
+        webhookId: wh.id,
+        url: wh.url,
+        success,
+        statusCode: lastStatusCode,
+        attempts,
+        error: success ? undefined : lastError,
+      } as WebhookDeliveryResult;
     });
 
     return Promise.all(deliveryPromises);
