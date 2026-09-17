@@ -2,6 +2,7 @@ import { TransactionBuilder, Transaction, Keypair, xdr } from "@stellar/stellar-
 import type { Signer } from "@lumen/types";
 import { type StellarClient, validateTimeBounds } from "@lumen/core";
 import { PolicyEngine } from "../policy/engine.js";
+import type { WebhookDispatcher } from "../webhook/dispatcher.js";
 
 export interface CosignerOpts {
   client: StellarClient;
@@ -10,6 +11,7 @@ export interface CosignerOpts {
   policyEngine: PolicyEngine;
   enforceTimeBounds?: boolean;
   maxValidityWindowSeconds?: number;
+  webhookDispatcher?: WebhookDispatcher;
 }
 
 export interface CosignRequest {
@@ -29,6 +31,7 @@ export class CosignerService {
   private policyEngine: PolicyEngine;
   private enforceTimeBounds: boolean;
   private maxValidityWindowSeconds?: number;
+  private webhookDispatcher?: WebhookDispatcher;
 
   constructor(opts: CosignerOpts) {
     this.client = opts.client;
@@ -36,6 +39,7 @@ export class CosignerService {
     this.policyEngine = opts.policyEngine;
     this.enforceTimeBounds = opts.enforceTimeBounds ?? false;
     this.maxValidityWindowSeconds = opts.maxValidityWindowSeconds;
+    this.webhookDispatcher = opts.webhookDispatcher;
   }
 
   get publicKey(): string {
@@ -77,6 +81,16 @@ export class CosignerService {
     });
 
     if (!policyResult.approved) {
+      if (this.webhookDispatcher) {
+        this.webhookDispatcher
+          .dispatch("policy.violated", {
+            walletAddress: request.walletAddress,
+            reason: policyResult.reason,
+            txHash: tx.hash().toString("hex"),
+          })
+          .catch(() => {});
+      }
+
       return {
         signedXdr: "",
         approved: false,
@@ -101,6 +115,15 @@ export class CosignerService {
         signature: Buffer.from(signature),
       })
     );
+
+    if (this.webhookDispatcher) {
+      this.webhookDispatcher
+        .dispatch("transaction.cosigned", {
+          walletAddress: request.walletAddress,
+          txHash: txHash.toString("hex"),
+        })
+        .catch(() => {});
+    }
 
     return {
       signedXdr: tx.toXDR(),
