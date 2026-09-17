@@ -6,6 +6,9 @@ export { InMemoryPolicyStore, RedisPolicyStore } from "./policy/store.js";
 export { WebhookDispatcher, type WebhookDispatcherOpts } from "./webhook/dispatcher.js";
 export { createServer, type ServerOpts, type ServerResult } from "./server.js";
 export { EnvSigner } from "./signers/EnvSigner.js";
+export { AwsKmsSigner } from "./signers/AwsKmsSigner.js";
+export { GcpKmsSigner } from "./signers/GcpKmsSigner.js";
+export { VaultSigner } from "./signers/VaultSigner.js";
 export {
   CosignRequestSchema,
   FeeBumpRequestSchema,
