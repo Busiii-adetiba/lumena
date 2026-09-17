@@ -243,7 +243,7 @@ export class PasskeyManager {
     const encoder = new TextEncoder();
     const secretKeyMaterial = await crypto.subtle.importKey(
       "raw",
-      credentialId,
+      credentialId as any,
       { name: "HMAC", hash: "SHA-256" },
       false,
       ["sign"]
