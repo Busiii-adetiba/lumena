@@ -8,7 +8,7 @@ import {
   type PasskeyRegistrationOpts,
   type PasskeyAssertionOpts,
 } from "@lumen/core";
-import type { StellarNetwork } from "@lumen/types";
+import type { StellarNetwork, ContractSimulationResult } from "@lumen/types";
 
 export interface LumenClientOpts {
   network?: StellarNetwork;
@@ -207,6 +207,29 @@ export class LumenClient {
     }
 
     return wallet.send(destination, asset, amount);
+  }
+
+  async simulateContract(
+    id: string,
+    contractId: string,
+    method: string,
+    args?: any[]
+  ): Promise<ContractSimulationResult> {
+    const wallet = this.wallets.get(id);
+    if (!wallet) throw new Error(`Wallet not found: ${id}`);
+    return wallet.simulateContract(contractId, method, args);
+  }
+
+  async invokeContract(
+    id: string,
+    contractId: string,
+    method: string,
+    args?: any[],
+    fee?: string
+  ): Promise<{ hash: string }> {
+    const wallet = this.wallets.get(id);
+    if (!wallet) throw new Error(`Wallet not found: ${id}`);
+    return wallet.invokeContract(contractId, method, args, fee);
   }
 }
 
