@@ -8,7 +8,7 @@ import { KeyManager } from "../keys/manager.js";
 import { Wallet } from "../wallet/wallet.js";
 
 const HORIZON_URL = process.env.HORIZON_URL ?? "http://localhost:8000";
-const RPC_URL = process.env.RPC_URL ?? "http://localhost:8000";
+const RPC_URL = process.env.RPC_URL ?? "http://localhost:8000/rpc";
 
 function getClient() {
   return new StellarClient({
@@ -105,6 +105,7 @@ describe("buildFeeBump", () => {
     const destination = Keypair.random();
 
     await client.rpc.requestAirdrop(sponsor.publicKey());
+    await client.rpc.requestAirdrop(destination.publicKey());
     await createSponsoredAccount({
       client,
       sponsorKeypair: sponsor,

@@ -29,21 +29,21 @@ describe("Sep41Token", () => {
       const token = new Sep41Token(contractId);
       const op = token.buildBalanceOperation(fromAddr);
 
-      expect(op.body.switch()).toBe(xdr.OperationType.invokeHostFunction());
+      expect(op.body().switch()).toBe(xdr.OperationType.invokeHostFunction());
     });
 
     it("encodes transfer arguments correctly", () => {
       const token = new Sep41Token(contractId);
       const op = token.transfer(fromAddr, toAddr, "1000000");
 
-      expect(op.body.switch()).toBe(xdr.OperationType.invokeHostFunction());
+      expect(op.body().switch()).toBe(xdr.OperationType.invokeHostFunction());
     });
 
     it("encodes approve arguments correctly", () => {
       const token = new Sep41Token(contractId);
       const op = token.approve(fromAddr, toAddr, "5000000", 123456);
 
-      expect(op.body.switch()).toBe(xdr.OperationType.invokeHostFunction());
+      expect(op.body().switch()).toBe(xdr.OperationType.invokeHostFunction());
     });
   });
 
