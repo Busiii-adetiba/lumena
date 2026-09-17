@@ -2,6 +2,7 @@ import {
   TransactionBuilder,
   Transaction,
   Keypair,
+  xdr,
 } from "@stellar/stellar-sdk";
 import type { Signer } from "@lumen/types";
 import type { StellarClient } from "@lumen/core";
@@ -55,10 +56,12 @@ export class FeeSponsorService {
     const signature = await this.signer.sign(txHash);
     const hint = feeSourceKeypair.rawPublicKey().slice(-4);
 
-    feeBump.signatures.push({
-      hint: () => hint,
-      signature: () => signature,
-    } as any);
+    feeBump.signatures.push(
+      new xdr.DecoratedSignature({
+        hint,
+        signature: Buffer.from(signature),
+      })
+    );
 
     return feeBump.toXDR();
   }
