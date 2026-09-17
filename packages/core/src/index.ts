@@ -9,5 +9,7 @@ export { Wallet } from "./wallet/wallet.js";
 export { Sep41Token } from "./stellar/sep41.js";
 export { buildTimeBounds, validateTimeBounds, type TimeBoundsValidationOpts, type TimeBoundsValidationResult } from "./stellar/timebounds.js";
 export { toScVal, fromScVal } from "./soroban/scval.js";
+export { ContractClient } from "./soroban/client.js";
+
 
 
