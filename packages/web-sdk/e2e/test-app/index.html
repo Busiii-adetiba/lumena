@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lumen Web SDK E2E Browser Test</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        background: #0f172a;
+        color: #f8fafc;
+      }
+      h1 { color: #38bdf8; }
+      .card {
+        background: #1e293b;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid #334155;
+      }
+      .card h2 { margin-top: 0; color: #94a3b8; font-size: 1.2rem; }
+      button {
+        background: #2563eb;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        margin-right: 0.5rem;
+      }
+      button:hover { background: #1d4ed8; }
+      button:disabled { opacity: 0.5; cursor: not-allowed; }
+      input {
+        background: #0f172a;
+        border: 1px solid #475569;
+        color: white;
+        padding: 0.5rem;
+        border-radius: 4px;
+        margin-bottom: 0.5rem;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .data-row {
+        margin: 0.5rem 0;
+        word-break: break-all;
+        font-family: monospace;
+      }
+      .success { color: #4ade80; }
+      .error { color: #f87171; }
+      .badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+      .badge-ready { background: #166534; color: #86efac; }
+      .badge-loading { background: #854d0e; color: #fef08a; }
+    </style>
+  </head>
+  <body>
+    <h1>✨ Lumen Web SDK E2E</h1>
+
+    <div class="card">
+      <h2>Client Status</h2>
+      <div class="data-row">
+        Status: <span id="client-status" data-testid="client-status" class="badge badge-loading">Initializing...</span>
+      </div>
+    </div>
+
+    <!-- Step 1: Wallet Creation -->
+    <div class="card">
+      <h2>1. Seedless Wallet Creation</h2>
+      <button id="btn-create-wallet" data-testid="btn-create-wallet">Create Seedless Wallet</button>
+      <div class="data-row">
+        Address: <span id="wallet-address" data-testid="wallet-address">-</span>
+      </div>
+      <div class="data-row">
+        Wallet ID: <span id="wallet-id" data-testid="wallet-id">-</span>
+      </div>
+      <div class="data-row">
+        Wallet Status: <span id="wallet-status" data-testid="wallet-status">idle</span>
+      </div>
+      <div id="wallet-error" data-testid="wallet-error" class="error"></div>
+    </div>
+
+    <!-- Step 2: Balance Query -->
+    <div class="card">
+      <h2>2. Balance Query</h2>
+      <button id="btn-get-balance" data-testid="btn-get-balance">Query XLM Balance</button>
+      <div class="data-row">
+        Balance: <span id="balance-value" data-testid="balance-value">-</span> XLM
+      </div>
+      <div class="data-row">
+        Balance Status: <span id="balance-status" data-testid="balance-status">idle</span>
+      </div>
+      <div id="balance-error" data-testid="balance-error" class="error"></div>
+    </div>
+
+    <!-- Step 3: Gasless Payment Submission -->
+    <div class="card">
+      <h2>3. Gasless Payment Submission</h2>
+      <label>Destination Address:</label>
+      <input type="text" id="payment-destination" data-testid="input-payment-destination" placeholder="Destination Public Key" />
+      <label>Amount (XLM):</label>
+      <input type="text" id="payment-amount" data-testid="input-payment-amount" value="1.0" />
+      <button id="btn-send-payment" data-testid="btn-send-payment">Send Gasless Payment</button>
+      <div class="data-row">
+        Payment Hash: <span id="payment-hash" data-testid="payment-hash" class="success">-</span>
+      </div>
+      <div class="data-row">
+        Payment Status: <span id="payment-status" data-testid="payment-status">idle</span>
+      </div>
+      <div id="payment-error" data-testid="payment-error" class="error"></div>
+    </div>
+
+    <!-- Step 4: Policy Rejection -->
+    <div class="card">
+      <h2>4. Policy Rejection Test</h2>
+      <label>Max Spend Per Tx (XLM limit):</label>
+      <input type="text" id="policy-limit" data-testid="input-policy-limit" value="5.0" />
+      <button id="btn-apply-policy" data-testid="btn-apply-policy">Apply Spend Limit Policy</button>
+      <div class="data-row">
+        Policy Status: <span id="policy-status" data-testid="policy-status">idle</span>
+      </div>
+      <div style="margin-top: 1rem;">
+        <button id="btn-test-policy-rejection" data-testid="btn-test-policy-rejection">Attempt Exceeding Payment (10 XLM)</button>
+      </div>
+      <div class="data-row">
+        Policy Rejection Result: <span id="policy-result" data-testid="policy-result">idle</span>
+      </div>
+      <div id="policy-error" data-testid="policy-error" class="error"></div>
+    </div>
+
+    <script type="module" src="/app.ts"></script>
+  </body>
+</html>
