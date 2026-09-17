@@ -18,7 +18,7 @@
     "commander": "^15.0.0",
     "@lumen/core": "workspace:*",
     "@lumen/types": "workspace:*",
-    "@stellar/stellar-sdk": "^16.0.1"
+    "@stellar/stellar-sdk": "^17.0.1"
   },
   "devDependencies": {
     "@types/node": "^26.5.1",
