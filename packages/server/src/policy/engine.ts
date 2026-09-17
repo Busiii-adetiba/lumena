@@ -37,8 +37,8 @@ export class PolicyEngine {
     this.velocityTracking.delete(walletId);
   }
 
-  getPolicy(walletId: string): Policy | undefined {
-    return this.policies.get(walletId);
+  getPolicy(walletId: string): Policy | null {
+    return this.policies.get(walletId) ?? null;
   }
 
   evaluate(opts: EvaluateOpts): EvaluateResult {
@@ -76,41 +76,64 @@ export class PolicyEngine {
   private evaluateSpendLimit(rule: SpendLimit, opts: EvaluateOpts): EvaluateResult {
     const { walletAddress } = opts;
 
-    // Get the first payment operation from the transaction
-    const paymentOp = opts.transaction.operations.find(
-      (op): op is Operation.Payment => "amount" in op && "destination" in op
-    ) as Operation.Payment | undefined;
+    const normalizeAsset = (a: any): string => {
+      if (!a) return "native";
+      if (typeof a === "string") {
+        return a === "XLM" || a === "native" ? "native" : a;
+      }
+      if (typeof a.isNative === "function" && a.isNative()) return "native";
+      if (a.code && a.issuer) return `${a.code}:${a.issuer}`;
+      return "native";
+    };
 
-    if (!paymentOp) {
-      return { approved: true }; // No payment operation, skip spend limit check
+    const targetAsset = normalizeAsset(rule.asset);
+
+    let totalAmount = 0;
+    let foundOp = false;
+
+    for (const op of (opts.transaction.operations as any[])) {
+      const opAsset = normalizeAsset(op.asset ?? op.sendAsset);
+      if (opAsset === targetAsset) {
+        const amtStr = op.amount ?? op.sendAmount ?? op.sendMax;
+        if (amtStr) {
+          totalAmount += parseFloat(amtStr);
+          foundOp = true;
+        }
+      }
     }
 
-    const txAmount = parseFloat(paymentOp.amount);
+    if (!foundOp) {
+      return { approved: true };
+    }
 
-    // Initialize tracking for this wallet if needed
+    if (totalAmount > parseFloat(rule.maxPerTx)) {
+      return {
+        approved: false,
+        reason: `Transaction amount ${totalAmount} exceeds per-tx limit ${rule.maxPerTx}`,
+      };
+    }
+
     if (!this.spendTracking.has(walletAddress)) {
       this.spendTracking.set(walletAddress, new Map());
     }
     const walletTrack = this.spendTracking.get(walletAddress)!;
     const today = new Date().toISOString().split("T")[0];
+    const trackKey = `${today}:${targetAsset}`;
 
-    if (!walletTrack.has(today)) {
-      walletTrack.set(today, { dailyTotal: 0, txCount: 0 });
+    if (!walletTrack.has(trackKey)) {
+      walletTrack.set(trackKey, { dailyTotal: 0, txCount: 0 });
     }
-    const track = walletTrack.get(today)!;
+    const track = walletTrack.get(trackKey)!;
 
-    // Check per-transaction limit
-    if (txAmount > parseFloat(rule.maxPerTx)) {
-      return { approved: false, reason: `Transaction amount ${txAmount} exceeds per-tx limit ${rule.maxPerTx}` };
+    if (track.dailyTotal + totalAmount > parseFloat(rule.maxDaily)) {
+      return {
+        approved: false,
+        reason: `Daily spending ${track.dailyTotal + totalAmount} exceeds limit ${rule.maxDaily}`,
+      };
     }
 
-    // Check daily limit
-    track.dailyTotal += txAmount;
+    track.dailyTotal += totalAmount;
     track.txCount++;
-
-    if (track.dailyTotal > parseFloat(rule.maxDaily)) {
-      return { approved: false, reason: `Daily spending ${track.dailyTotal} exceeds limit ${rule.maxDaily}` };
-    }
 
     return { approved: true };
   }
@@ -147,20 +170,16 @@ export class PolicyEngine {
   }
 
   private evaluateAllowlist(rule: AllowlistRule, opts: EvaluateOpts): EvaluateResult {
-    // Get the first payment operation's destination from the transaction
-    const paymentOp = opts.transaction.operations.find(
-      (op): op is Operation.Payment => "amount" in op && "destination" in op
-    ) as Operation.Payment | undefined;
-
-    if (!paymentOp) {
-      return { approved: true }; // No payment operation, skip allowlist check
-    }
-
-    const destination = paymentOp.destination.toString();
-    const allowed = rule.destinations.includes(destination);
-
-    if (!allowed) {
-      return { approved: false, reason: `Destination ${destination} is not on the allowlist` };
+    for (const op of (opts.transaction.operations as any[])) {
+      const destination = op.destination?.toString();
+      if (destination) {
+        if (!rule.destinations.includes(destination)) {
+          return {
+            approved: false,
+            reason: `Destination ${destination} is not on the allowlist`,
+          };
+        }
+      }
     }
 
     return { approved: true };
