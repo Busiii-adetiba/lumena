@@ -37,12 +37,6 @@ export interface SessionKeyPolicyRule {
   expiresAt: number;
 }
 
-export interface TimeBoundsRule {
-  type: "timebounds";
-  maxWindowSeconds?: number;
-  allowUnbounded?: boolean;
-}
-
 export interface PolicyStore {
   getPolicy(walletId: string): Promise<Policy | null>;
   savePolicy(policy: Policy): Promise<void>;

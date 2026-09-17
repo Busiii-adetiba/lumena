@@ -1,5 +1,6 @@
 import pino from "pino";
-import pinoHttp from "pino-http";
+import { pinoHttp } from "pino-http";
+import type { IncomingMessage } from "node:http";
 import { randomUUID } from "node:crypto";
 
 const logLevel = process.env.LOG_LEVEL ?? "info";
@@ -29,9 +30,9 @@ export const logger = pino({
   },
 });
 
-export const httpLogger = (pinoHttp as any)({
+export const httpLogger = (pinoHttp as unknown as typeof pinoHttp)({
   logger,
-  genReqId: (req: any) => (req.headers["x-request-id"] as string) || randomUUID(),
+  genReqId: (req: IncomingMessage) => (req.headers["x-request-id"] as string) || randomUUID(),
   customAttributeKeys: {
     req: "req",
     res: "res",

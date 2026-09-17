@@ -1,4 +1,5 @@
-import { Keypair, Asset, Operation, TransactionBuilder, BASE_FEE } from "@stellar/stellar-sdk";
+import type { Keypair, Asset} from "@stellar/stellar-sdk";
+import { Operation, TransactionBuilder, BASE_FEE } from "@stellar/stellar-sdk";
 import type { StellarClient } from "../stellar/client.js";
 import { createSponsoredAccount } from "../stellar/account.js";
 import { setupMultisig } from "../stellar/multisig.js";
@@ -28,6 +29,9 @@ export class Wallet {
     this.serverPublicKey = opts.serverPublicKey;
     this.initialOwnerKeypair = opts.ownerKeypair;
     this.keyManager = new KeyManager();
+    if (opts.ownerKeypair) {
+      this._keypair = opts.ownerKeypair;
+    }
   }
 
   get address(): string {
@@ -36,7 +40,9 @@ export class Wallet {
   }
 
   async create(): Promise<{ address: string; publicKey: string }> {
-    this._keypair = this.initialOwnerKeypair ?? this.keyManager.generateKeypair();
+    if (!this._keypair) {
+      this._keypair = this.keyManager.generateKeypair();
+    }
 
     await createSponsoredAccount({
       client: this.client,

@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { Sep41Token } from "../stellar/sep41.js";
-import { Keypair, Address, nativeToScVal, xdr } from "@stellar/stellar-sdk";
+import { Keypair, nativeToScVal, xdr } from "@stellar/stellar-sdk";
 import { StellarClient } from "../stellar/client.js";
 
 describe("Sep41Token", () => {

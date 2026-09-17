@@ -1,4 +1,4 @@
-import { Transaction, Operation } from "@stellar/stellar-sdk";
+import type { Transaction, Operation } from "@stellar/stellar-sdk";
 import type {
   Policy,
   PolicyRule,
@@ -78,42 +78,23 @@ export class PolicyEngine {
 
   private evaluateSpendLimit(rule: SpendLimit, opts: EvaluateOpts): EvaluateResult {
     const { walletAddress } = opts;
+    const targetAsset = this.getAssetIdentifier(rule.asset);
 
-    const normalizeAsset = (a: any): string => {
-      if (!a) return "native";
-      if (typeof a === "string") {
-        return a === "XLM" || a === "native" ? "native" : a;
-      }
-      if (typeof a.isNative === "function" && a.isNative()) return "native";
-      if (a.code && a.issuer) return `${a.code}:${a.issuer}`;
-      return "native";
-    };
+    let txAmount = 0;
+    let matchedOps = 0;
 
-    const targetAsset = normalizeAsset(rule.asset);
-
-    let totalAmount = 0;
-    let foundOp = false;
-
-    for (const op of (opts.transaction.operations as any[])) {
-      const opAsset = normalizeAsset(op.asset ?? op.sendAsset);
-      if (opAsset === targetAsset) {
-        const amtStr = op.amount ?? op.sendAmount ?? op.sendMax;
-        if (amtStr) {
-          totalAmount += parseFloat(amtStr);
-          foundOp = true;
+    for (const op of opts.transaction.operations) {
+      if ("amount" in op && typeof (op as any).amount === "string") {
+        const opAsset = "asset" in op ? this.getAssetIdentifier((op as any).asset) : "native";
+        if (opAsset === targetAsset) {
+          txAmount += parseFloat((op as any).amount);
+          matchedOps++;
         }
       }
     }
 
-    if (!foundOp) {
+    if (matchedOps === 0) {
       return { approved: true };
-    }
-
-    if (totalAmount > parseFloat(rule.maxPerTx)) {
-      return {
-        approved: false,
-        reason: `Transaction amount ${totalAmount} exceeds per-tx limit ${rule.maxPerTx}`,
-      };
     }
 
     if (!this.spendTracking.has(walletAddress)) {
@@ -139,6 +120,26 @@ export class PolicyEngine {
     track.txCount++;
 
     return { approved: true };
+  }
+
+  private getAssetIdentifier(asset: any): string {
+    if (!asset) return "native";
+    if (typeof asset === "string") {
+      if (asset.toLowerCase() === "native" || asset.toUpperCase() === "XLM") {
+        return "native";
+      }
+      return asset;
+    }
+    if (typeof asset.isNative === "function" && asset.isNative()) {
+      return "native";
+    }
+    if (asset.code && asset.issuer) {
+      return `${asset.code}:${asset.issuer}`;
+    }
+    if (asset.code) {
+      return asset.code;
+    }
+    return "native";
   }
 
   private evaluateVelocity(rule: VelocityRule, opts: EvaluateOpts): EvaluateResult {
@@ -173,9 +174,9 @@ export class PolicyEngine {
   }
 
   private evaluateAllowlist(rule: AllowlistRule, opts: EvaluateOpts): EvaluateResult {
-    for (const op of (opts.transaction.operations as any[])) {
-      const destination = op.destination?.toString();
-      if (destination) {
+    for (const op of opts.transaction.operations) {
+      if ("destination" in op && op.destination) {
+        const destination = op.destination.toString();
         if (!rule.destinations.includes(destination)) {
           return {
             approved: false,

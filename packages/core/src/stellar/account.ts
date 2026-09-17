@@ -1,8 +1,7 @@
+import type { Keypair } from "@stellar/stellar-sdk";
 import {
-  Keypair,
   TransactionBuilder,
   Operation,
-  Asset,
   BASE_FEE,
 } from "@stellar/stellar-sdk";
 import type { StellarClient } from "./client.js";

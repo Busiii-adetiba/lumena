@@ -82,26 +82,23 @@ export class AwsKmsSigner implements Signer {
     const signer = new AwsKmsSigner(keyId, region);
     // Eagerly fetch and cache the public key so startup fails fast if IAM
     // permissions are wrong rather than at the first sign request.
-    await signer.fetchPublicKey();
+    await signer.init();
     return signer;
   }
 
-  async fetchPublicKey(): Promise<string> {
-    if (this.cachedPublicKey) return this.cachedPublicKey;
+  async init(): Promise<void> {
+    if (this.cachedPublicKey) return;
     const client = new KMSClient({ region: this.region });
     const derPublicKey = await client.send(
       new GetPublicKeyCommand({ KeyId: this.keyId })
     );
     const rawPubkeyBytes = derPublicKey.PublicKey as Buffer;
     this.cachedPublicKey = StrKey.encodeEd25519PublicKey(rawPubkeyBytes);
-    return this.cachedPublicKey;
   }
 
   publicKey(): string {
     if (!this.cachedPublicKey) {
-      throw new Error(
-        "AwsKmsSigner: public key not cached. Call fetchPublicKey() first or use AwsKmsSigner.fromEnv()"
-      );
+      throw new Error("AwsKmsSigner: publicKey called before initialization. Use AwsKmsSigner.fromEnv or call init() first.");
     }
     return this.cachedPublicKey;
   }

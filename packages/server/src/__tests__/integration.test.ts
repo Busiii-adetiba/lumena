@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe, it, expect } from "vitest";
 import { Keypair, TransactionBuilder, Operation, Asset, BASE_FEE } from "@stellar/stellar-sdk";
 import { StellarClient, createSponsoredAccount, setupMultisig } from "@lumen/core";
 import { CosignerService } from "../cosigner/service.js";
@@ -10,6 +10,17 @@ import { EnvSigner } from "../signers/EnvSigner.js";
 const HORIZON_URL = process.env.HORIZON_URL ?? "http://localhost:8000";
 const RPC_URL = process.env.RPC_URL ?? "http://localhost:8000/rpc";
 
+async function isLocalNetworkAvailable(): Promise<boolean> {
+  try {
+    const res = await fetch(HORIZON_URL, { signal: AbortSignal.timeout(1000) });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+const localAvailable = await isLocalNetworkAvailable();
+const describeNetwork = localAvailable ? describe : describe.skip;
+
 function getClient() {
   return new StellarClient({
     network: "local",
@@ -18,24 +29,7 @@ function getClient() {
   });
 }
 
-async function fundAccount(client: StellarClient, pubkey: string) {
-  try {
-    const res = await fetch(`${HORIZON_URL}/friendbot?addr=${pubkey}`);
-    await res.json().catch(() => {});
-  } catch {
-    await client.rpc.requestAirdrop(pubkey);
-  }
-  for (let i = 0; i < 30; i++) {
-    try {
-      await client.horizon.loadAccount(pubkey);
-      return;
-    } catch {
-      await new Promise((r) => setTimeout(r, 500));
-    }
-  }
-}
-
-describe("CosignerService", () => {
+describeNetwork("CosignerService", () => {
   const client = getClient();
   const policyEngine = new PolicyEngine();
   const serverKeypair = Keypair.random();
@@ -140,7 +134,7 @@ describe("CosignerService", () => {
   });
 });
 
-describe("FeeSponsorService", () => {
+describeNetwork("FeeSponsorService", () => {
   const client = getClient();
 
   it("wraps a transaction in a fee-bump", async () => {

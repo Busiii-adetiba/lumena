@@ -1,11 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { PolicyEngine } from "../policy/engine.js";
-import {
-  createSpendLimitPolicy,
-  createAllowlistPolicy,
-  createVelocityPolicy,
-  createTimeBoundsPolicy,
-} from "../policy/rules.js";
+import { createSpendLimitPolicy, createAllowlistPolicy } from "../policy/rules.js";
 import type { Transaction } from "@stellar/stellar-sdk";
 
 describe("PolicyEngine Multi-Op & Asset Spend Limits", () => {
