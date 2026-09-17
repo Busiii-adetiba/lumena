@@ -1,6 +1,6 @@
 import { TransactionBuilder, Transaction, Keypair, xdr } from "@stellar/stellar-sdk";
 import type { Signer } from "@lumen/types";
-import type { StellarClient } from "@lumen/core";
+import { type StellarClient, validateTimeBounds } from "@lumen/core";
 import { PolicyEngine } from "../policy/engine.js";
 
 export interface CosignerOpts {
@@ -8,6 +8,8 @@ export interface CosignerOpts {
   /** Production: use an AwsKmsSigner. Dev/testnet: use an EnvSigner. */
   signer: Signer;
   policyEngine: PolicyEngine;
+  enforceTimeBounds?: boolean;
+  maxValidityWindowSeconds?: number;
 }
 
 export interface CosignRequest {
@@ -25,11 +27,15 @@ export class CosignerService {
   private client: StellarClient;
   private signer: Signer;
   private policyEngine: PolicyEngine;
+  private enforceTimeBounds: boolean;
+  private maxValidityWindowSeconds?: number;
 
   constructor(opts: CosignerOpts) {
     this.client = opts.client;
     this.signer = opts.signer;
     this.policyEngine = opts.policyEngine;
+    this.enforceTimeBounds = opts.enforceTimeBounds ?? false;
+    this.maxValidityWindowSeconds = opts.maxValidityWindowSeconds;
   }
 
   get publicKey(): string {
@@ -49,6 +55,20 @@ export class CosignerService {
         approved: false,
         reason: "Expected a regular transaction, got fee-bump",
       };
+    }
+
+    if (this.enforceTimeBounds) {
+      const tbCheck = validateTimeBounds(tx, {
+        maxWindowSeconds: this.maxValidityWindowSeconds,
+        allowUnbounded: false,
+      });
+      if (!tbCheck.valid) {
+        return {
+          signedXdr: "",
+          approved: false,
+          reason: tbCheck.reason ?? "Timebounds validation failed",
+        };
+      }
     }
 
     const policyResult = await this.policyEngine.evaluate({
