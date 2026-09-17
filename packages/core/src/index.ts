@@ -7,3 +7,5 @@ export { KeyManager } from "./keys/manager.js";
 export { PasskeyManager, type PasskeyCredential, type PasskeyRegistrationOpts, type PasskeyAssertionOpts } from "./keys/passkey.js";
 export { Wallet } from "./wallet/wallet.js";
 export { Sep41Token } from "./stellar/sep41.js";
+export { buildTimeBounds, validateTimeBounds, type TimeBoundsValidationOpts, type TimeBoundsValidationResult } from "./stellar/timebounds.js";
+
