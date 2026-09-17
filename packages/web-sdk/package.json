@@ -14,15 +14,20 @@
     "build": "tsc",
     "lint": "eslint src/",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@lumen/types": "workspace:*",
     "@lumen/core": "workspace:*",
+    "@lumen/types": "workspace:*",
     "@stellar/stellar-sdk": "^16.0.1"
   },
   "devDependencies": {
+    "@lumen/server": "workspace:*",
+    "@playwright/test": "^1.63.0",
+    "buffer": "^6.0.3",
     "typescript": "^5.8.0",
+    "vite": "^6.2.0",
     "vitest": "^3.0.0"
   }
 }
