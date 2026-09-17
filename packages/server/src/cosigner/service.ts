@@ -1,4 +1,4 @@
-import { TransactionBuilder, Transaction, Keypair } from "@stellar/stellar-sdk";
+import { TransactionBuilder, Transaction, Keypair, xdr } from "@stellar/stellar-sdk";
 import type { Signer } from "@lumen/types";
 import type { StellarClient } from "@lumen/core";
 import { PolicyEngine } from "../policy/engine.js";
@@ -75,10 +75,12 @@ export class CosignerService {
     ).rawPublicKey();
     const hint = rawPublicKey.slice(-4);
 
-    tx.signatures.push({
-      hint: () => hint,
-      signature: () => signature,
-    } as any);
+    tx.signatures.push(
+      new xdr.DecoratedSignature({
+        hint,
+        signature: Buffer.from(signature),
+      })
+    );
 
     return {
       signedXdr: tx.toXDR(),
