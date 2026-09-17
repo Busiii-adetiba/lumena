@@ -33,6 +33,7 @@ import {
 } from "./metrics.js";
 
 import { SponsorMonitorService } from "./fee-sponsor/monitor.js";
+import { WebhookDispatcher } from "./webhook/dispatcher.js";
 
 export interface ServerResult {
   app: Express;
@@ -42,6 +43,7 @@ export interface ServerResult {
   feeSponsorService: FeeSponsorService;
   sponsorMonitorService: SponsorMonitorService;
   policyEngine: PolicyEngine;
+  webhookDispatcher: WebhookDispatcher;
 }
 
 export interface ServerOpts {
@@ -61,6 +63,7 @@ export interface ServerOpts {
   feePayerSigner: Signer;
   minSponsorBalance?: number;
   sponsorPollIntervalMs?: number;
+  webhookDispatcher?: WebhookDispatcher;
 }
 
 export function createServer(opts: ServerOpts): ServerResult {
@@ -73,16 +76,19 @@ export function createServer(opts: ServerOpts): ServerResult {
   });
 
   const policyEngine = new PolicyEngine();
+  const webhookDispatcher = opts.webhookDispatcher ?? new WebhookDispatcher();
 
   const cosignerService = new CosignerService({
     client,
     signer: opts.cosignerSigner,
     policyEngine,
+    webhookDispatcher,
   });
 
   const feeSponsorService = new FeeSponsorService({
     client,
     signer: opts.feePayerSigner,
+    webhookDispatcher,
   });
 
   const sponsorMonitorService = new SponsorMonitorService({
@@ -97,6 +103,17 @@ export function createServer(opts: ServerOpts): ServerResult {
     httpLogger(req as unknown as IncomingMessage, res, next);
   });
   app.use(express.json());
+
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, x-request-id");
+    if (req.method === "OPTIONS") {
+      res.sendStatus(204);
+      return;
+    }
+    next();
+  });
 
   app.use((req: Request, res: Response, next: NextFunction) => {
     if (req.id) {
@@ -235,6 +252,29 @@ export function createServer(opts: ServerOpts): ServerResult {
     res.json({ address: result.address, publicKey: result.publicKey });
   }));
 
+  app.post("/webhooks", wrapHandler(async (req: Request, res: Response) => {
+    const { url, secret, events, enabled } = req.body;
+    if (!url || !secret || !Array.isArray(events)) {
+      throw new ValidationError("url, secret, and events array are required");
+    }
+    const id = req.body.id || crypto.randomUUID();
+    webhookDispatcher.register({ id, url, secret, events, enabled });
+    res.status(201).json({ id, url, events, enabled: enabled ?? true });
+  }));
+
+  app.get("/webhooks", (_req: Request, res: Response) => {
+    res.json(webhookDispatcher.list().map(({ secret, ...rest }) => rest));
+  });
+
+  app.delete("/webhooks/:id", (req: Request, res: Response) => {
+    const deleted = webhookDispatcher.unregister(req.params.id as string);
+    if (!deleted) {
+      res.status(404).json({ error: "Webhook not found" });
+      return;
+    }
+    res.status(204).send();
+  });
+
   app.use(errorHandler);
 
   const server = createHttpServer(app as unknown as RequestListener);
@@ -281,5 +321,6 @@ export function createServer(opts: ServerOpts): ServerResult {
     feeSponsorService,
     sponsorMonitorService,
     policyEngine,
+    webhookDispatcher,
   };
 }

@@ -20,7 +20,7 @@ const NETWORKS: Record<StellarNetwork, StellarConfig> = {
   local: {
     network: "local",
     horizonUrl: "http://localhost:8000",
-    rpcUrl: "http://localhost:8000",
+    rpcUrl: "http://localhost:8000/rpc",
     networkPassphrase: Networks.STANDALONE,
   },
 };

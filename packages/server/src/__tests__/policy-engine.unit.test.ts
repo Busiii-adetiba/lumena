@@ -128,3 +128,87 @@ describe("PolicyEngine Multi-Op & Asset Spend Limits", () => {
     expect(resDaily.reason).toContain("exceeds limit 100");
   });
 });
+
+describe("PolicyEngine TimeBounds & Expiration Enforcement", () => {
+  const walletId = "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF";
+
+  it("rejects transactions without TimeBounds when unbounded is not permitted", async () => {
+    const engine = new PolicyEngine();
+    engine.addPolicy(createTimeBoundsPolicy(walletId, 300, false));
+
+    const txNoBounds = {
+      operations: [],
+      timeBounds: undefined,
+    } as unknown as Transaction;
+
+    const result = engine.evaluate({ walletAddress: walletId, transaction: txNoBounds });
+    expect(result.approved).toBe(false);
+    expect(result.reason).toContain("does not have required TimeBounds");
+  });
+
+  it("approves transactions without TimeBounds when allowUnbounded is true", async () => {
+    const engine = new PolicyEngine();
+    engine.addPolicy(createTimeBoundsPolicy(walletId, 300, true));
+
+    const txNoBounds = {
+      operations: [],
+      timeBounds: undefined,
+    } as unknown as Transaction;
+
+    const result = engine.evaluate({ walletAddress: walletId, transaction: txNoBounds });
+    expect(result.approved).toBe(true);
+  });
+
+  it("rejects expired transactions", async () => {
+    const engine = new PolicyEngine();
+    engine.addPolicy(createTimeBoundsPolicy(walletId, 300));
+
+    const now = Math.floor(Date.now() / 1000);
+    const expiredTx = {
+      operations: [],
+      timeBounds: {
+        minTime: (now - 600).toString(),
+        maxTime: (now - 10).toString(),
+      },
+    } as unknown as Transaction;
+
+    const result = engine.evaluate({ walletAddress: walletId, transaction: expiredTx });
+    expect(result.approved).toBe(false);
+    expect(result.reason).toContain("has expired");
+  });
+
+  it("rejects transactions exceeding the maximum validity window", async () => {
+    const engine = new PolicyEngine();
+    engine.addPolicy(createTimeBoundsPolicy(walletId, 120)); // max 120s window
+
+    const now = Math.floor(Date.now() / 1000);
+    const wideWindowTx = {
+      operations: [],
+      timeBounds: {
+        minTime: now.toString(),
+        maxTime: (now + 600).toString(), // 600s > 120s
+      },
+    } as unknown as Transaction;
+
+    const result = engine.evaluate({ walletAddress: walletId, transaction: wideWindowTx });
+    expect(result.approved).toBe(false);
+    expect(result.reason).toContain("exceeds policy limit of 120s");
+  });
+
+  it("approves valid transactions within timebounds", async () => {
+    const engine = new PolicyEngine();
+    engine.addPolicy(createTimeBoundsPolicy(walletId, 300));
+
+    const now = Math.floor(Date.now() / 1000);
+    const validTx = {
+      operations: [],
+      timeBounds: {
+        minTime: (now - 10).toString(),
+        maxTime: (now + 120).toString(),
+      },
+    } as unknown as Transaction;
+
+    const result = engine.evaluate({ walletAddress: walletId, transaction: validTx });
+    expect(result.approved).toBe(true);
+  });
+});

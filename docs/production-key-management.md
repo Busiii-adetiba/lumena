@@ -77,7 +77,9 @@ Two implementations ship with the server:
 | Class | Location | Use case |
 |---|---|---|
 | `EnvSigner` | `src/signers/EnvSigner.ts` | Dev / testnet only |
-| `AwsKmsSigner` | `src/signers/AwsKmsSigner.ts` | Production (stub — see §4) |
+| `AwsKmsSigner` | `src/signers/AwsKmsSigner.ts` | AWS KMS production signer |
+| `GcpKmsSigner` | `src/signers/GcpKmsSigner.ts` | Google Cloud KMS asymmetric signer |
+| `VaultSigner` | `src/signers/VaultSigner.ts` | HashiCorp Vault Transit native Ed25519 signer |
 
 To add your own provider (HashiCorp Vault, GCP KMS, Nitro Enclave, etc.),
 implement the `Signer` interface and wire it in `main.ts`.
@@ -177,36 +179,69 @@ pnpm add @noble/curves   # for DER parsing helpers
 ## 5. Other HSM options
 
 ### HashiCorp Vault Transit
-
-Vault Transit supports **Ed25519 natively**, which removes the key-type
-mismatch.  It works on-premises and in self-hosted environments.
-
-```bash
-# Enable Transit
-vault secrets enable transit
-
-# Create co-signer key
-vault write transit/keys/lumen-cosigner type=ed25519
-
-# Create fee-payer key
-vault write transit/keys/lumen-fee-payer type=ed25519
-```
-
-Sign a payload:
-
-```bash
-vault write transit/sign/lumen-cosigner \
-  input=$(echo -n "<base64-hash>" | base64)
-```
-
-Implement a `VaultSigner` by calling the Vault HTTP API:
-`POST /v1/transit/sign/<keyname>`.
-
-### GCP Cloud KMS
-
-GCP KMS supports Ed25519 (`EC_SIGN_ED25519`) in certain regions.  The
-integration shape is the same as `AwsKmsSigner`; use
-`@google-cloud/kms` and the `asymmetricSign` method.
+ 
+ Vault Transit supports **Ed25519 natively**, which removes the key-type
+ mismatch.  It works on-premises, in HashiCorp Cloud Platform (HCP), and in self-hosted environments.
+ 
+ ```bash
+ # Enable Transit engine
+ vault secrets enable transit
+ 
+ # Create co-signer key with ed25519 type
+ vault write transit/keys/lumen-cosigner type=ed25519
+ 
+ # Create fee-payer key with ed25519 type
+ vault write transit/keys/lumen-fee-payer type=ed25519
+ ```
+ 
+ #### Environment Variables for VaultSigner
+ ```bash
+ SIGNER_PROVIDER=vault
+ VAULT_ADDR=https://vault.yourdomain.com:8200
+ VAULT_TOKEN=s.exampletoken
+ VAULT_KEY_NAME=lumen-cosigner
+ VAULT_MOUNT_PATH=transit
+ VAULT_NAMESPACE=finance/lumen # optional
+ ```
+ 
+ Usage with `VaultSigner`:
+ ```ts
+ import { VaultSigner } from "@lumen/server";
+ 
+ const signer = await VaultSigner.fromEnv("VAULT");
+ ```
+ 
+ ### GCP Cloud KMS
+ 
+ GCP Cloud KMS supports asymmetric signing with keys stored in Cloud HSM.
+ 
+ #### Creating Keys in GCP Cloud KMS
+ ```bash
+ # Create key ring
+ gcloud kms keyrings create lumen-ring \
+   --location global
+ 
+ # Create asymmetric signing key
+ gcloud kms keys create lumen-cosigner \
+   --location global \
+   --keyring lumen-ring \
+   --purpose asymmetric-signing \
+   --default-algorithm ec-sign-ed25519-sha512
+ ```
+ 
+ #### Environment Variables for GcpKmsSigner
+ ```bash
+ SIGNER_PROVIDER=gcpkms
+ GCP_KMS_KEY_RESOURCE_NAME=projects/MY_PROJECT/locations/global/keyRings/lumen-ring/cryptoKeys/lumen-cosigner/cryptoKeyVersions/1
+ GCP_KMS_ACCESS_TOKEN=ya29... # optional if using Google Default Application Credentials
+ ```
+ 
+ Usage with `GcpKmsSigner`:
+ ```ts
+ import { GcpKmsSigner } from "@lumen/server";
+ 
+ const signer = await GcpKmsSigner.fromEnv("GCP_KMS");
+ ```
 
 ### Azure Key Vault
 

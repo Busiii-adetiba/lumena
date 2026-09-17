@@ -1,4 +1,4 @@
-import { TransactionBuilder, Transaction, Keypair } from "@stellar/stellar-sdk";
+import { TransactionBuilder, Transaction, Keypair, xdr } from "@stellar/stellar-sdk";
 import type { Signer } from "@lumen/types";
 import type { StellarClient } from "@lumen/core";
 import type { PolicyEngine } from "../policy/engine.js";
@@ -8,6 +8,9 @@ export interface CosignerOpts {
   /** Production: use an AwsKmsSigner. Dev/testnet: use an EnvSigner. */
   signer: Signer;
   policyEngine: PolicyEngine;
+  enforceTimeBounds?: boolean;
+  maxValidityWindowSeconds?: number;
+  webhookDispatcher?: WebhookDispatcher;
 }
 
 export interface CosignRequest {
@@ -25,11 +28,17 @@ export class CosignerService {
   private client: StellarClient;
   private signer: Signer;
   private policyEngine: PolicyEngine;
+  private enforceTimeBounds: boolean;
+  private maxValidityWindowSeconds?: number;
+  private webhookDispatcher?: WebhookDispatcher;
 
   constructor(opts: CosignerOpts) {
     this.client = opts.client;
     this.signer = opts.signer;
     this.policyEngine = opts.policyEngine;
+    this.enforceTimeBounds = opts.enforceTimeBounds ?? false;
+    this.maxValidityWindowSeconds = opts.maxValidityWindowSeconds;
+    this.webhookDispatcher = opts.webhookDispatcher;
   }
 
   get publicKey(): string {
@@ -51,12 +60,36 @@ export class CosignerService {
       };
     }
 
+    if (this.enforceTimeBounds) {
+      const tbCheck = validateTimeBounds(tx, {
+        maxWindowSeconds: this.maxValidityWindowSeconds,
+        allowUnbounded: false,
+      });
+      if (!tbCheck.valid) {
+        return {
+          signedXdr: "",
+          approved: false,
+          reason: tbCheck.reason ?? "Timebounds validation failed",
+        };
+      }
+    }
+
     const policyResult = await this.policyEngine.evaluate({
       walletAddress: request.walletAddress,
       transaction: tx,
     });
 
     if (!policyResult.approved) {
+      if (this.webhookDispatcher) {
+        this.webhookDispatcher
+          .dispatch("policy.violated", {
+            walletAddress: request.walletAddress,
+            reason: policyResult.reason,
+            txHash: tx.hash().toString("hex"),
+          })
+          .catch(() => {});
+      }
+
       return {
         signedXdr: "",
         approved: false,
@@ -75,10 +108,21 @@ export class CosignerService {
     ).rawPublicKey();
     const hint = rawPublicKey.slice(-4);
 
-    tx.signatures.push({
-      hint: () => hint,
-      signature: () => signature,
-    } as any);
+    tx.signatures.push(
+      new xdr.DecoratedSignature({
+        hint,
+        signature: Buffer.from(signature),
+      })
+    );
+
+    if (this.webhookDispatcher) {
+      this.webhookDispatcher
+        .dispatch("transaction.cosigned", {
+          walletAddress: request.walletAddress,
+          txHash: txHash.toString("hex"),
+        })
+        .catch(() => {});
+    }
 
     return {
       signedXdr: tx.toXDR(),

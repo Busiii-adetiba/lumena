@@ -1,0 +1,30 @@
+export type WebhookEventType =
+  | "transaction.cosigned"
+  | "transaction.sponsored"
+  | "policy.violated"
+  | "balance.low"
+  | "*";
+
+export interface WebhookConfig {
+  id: string;
+  url: string;
+  secret: string;
+  events: WebhookEventType[];
+  enabled?: boolean;
+}
+
+export interface WebhookPayload<T = unknown> {
+  id: string;
+  event: WebhookEventType;
+  timestamp: string;
+  data: T;
+}
+
+export interface WebhookDeliveryResult {
+  webhookId: string;
+  url: string;
+  success: boolean;
+  statusCode?: number;
+  attempts: number;
+  error?: string;
+}

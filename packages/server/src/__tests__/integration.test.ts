@@ -8,7 +8,7 @@ import { createSpendLimitPolicy, createAllowlistPolicy } from "../policy/rules.j
 import { EnvSigner } from "../signers/EnvSigner.js";
 
 const HORIZON_URL = process.env.HORIZON_URL ?? "http://localhost:8000";
-const RPC_URL = process.env.RPC_URL ?? "http://localhost:8000";
+const RPC_URL = process.env.RPC_URL ?? "http://localhost:8000/rpc";
 
 async function isLocalNetworkAvailable(): Promise<boolean> {
   try {
@@ -39,7 +39,7 @@ describeNetwork("CosignerService", () => {
     const sponsor = Keypair.random();
     const walletKeypair = Keypair.random();
 
-    await client.rpc.requestAirdrop(sponsor.publicKey());
+    await fundAccount(client, sponsor.publicKey());
 
     await createSponsoredAccount({
       client,
@@ -142,8 +142,8 @@ describeNetwork("FeeSponsorService", () => {
     const source = Keypair.random();
     const sponsor = Keypair.random();
 
-    await client.rpc.requestAirdrop(feePayer.publicKey());
-    await client.rpc.requestAirdrop(sponsor.publicKey());
+    await fundAccount(client, feePayer.publicKey());
+    await fundAccount(client, sponsor.publicKey());
 
     await createSponsoredAccount({
       client,
@@ -186,8 +186,9 @@ describeNetwork("FeeSponsorService", () => {
     const sponsor = Keypair.random();
     const destination = Keypair.random();
 
-    await client.rpc.requestAirdrop(feePayer.publicKey());
-    await client.rpc.requestAirdrop(sponsor.publicKey());
+    await fundAccount(client, feePayer.publicKey());
+    await fundAccount(client, sponsor.publicKey());
+    await fundAccount(client, destination.publicKey());
 
     await createSponsoredAccount({
       client,

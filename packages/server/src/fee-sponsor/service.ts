@@ -2,26 +2,31 @@ import {
   TransactionBuilder,
   Transaction,
   Keypair,
+  xdr,
 } from "@stellar/stellar-sdk";
 import type { Signer } from "@lumen/types";
 import type { StellarClient } from "@lumen/core";
+import type { WebhookDispatcher } from "../webhook/dispatcher.js";
 
 export interface FeeSponsorOpts {
   client: StellarClient;
   /** Production: use an AwsKmsSigner. Dev/testnet: use an EnvSigner. */
   signer: Signer;
   baseFee?: string;
+  webhookDispatcher?: WebhookDispatcher;
 }
 
 export class FeeSponsorService {
   private client: StellarClient;
   private signer: Signer;
   private baseFee: string;
+  private webhookDispatcher?: WebhookDispatcher;
 
   constructor(opts: FeeSponsorOpts) {
     this.client = opts.client;
     this.signer = opts.signer;
     this.baseFee = opts.baseFee ?? "1000000";
+    this.webhookDispatcher = opts.webhookDispatcher;
   }
 
   get publicKey(): string {
@@ -55,10 +60,12 @@ export class FeeSponsorService {
     const signature = await this.signer.sign(txHash);
     const hint = feeSourceKeypair.rawPublicKey().slice(-4);
 
-    feeBump.signatures.push({
-      hint: () => hint,
-      signature: () => signature,
-    } as any);
+    feeBump.signatures.push(
+      new xdr.DecoratedSignature({
+        hint,
+        signature: Buffer.from(signature),
+      })
+    );
 
     return feeBump.toXDR();
   }
@@ -76,6 +83,15 @@ export class FeeSponsorService {
 
     if (!result.successful) {
       throw new Error(`Fee-bump submission failed: ${result.hash}`);
+    }
+
+    if (this.webhookDispatcher) {
+      this.webhookDispatcher
+        .dispatch("transaction.sponsored", {
+          feeSource: this.signer.publicKey(),
+          hash: result.hash,
+        })
+        .catch(() => {});
     }
 
     return { hash: result.hash, feeBumpHash: result.hash };

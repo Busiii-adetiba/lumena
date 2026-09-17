@@ -6,6 +6,7 @@ import type {
   VelocityRule,
   AllowlistRule,
   SessionKeyPolicyRule,
+  TimeBoundsRule,
 } from "@lumen/types";
 
 export interface EvaluateOpts {
@@ -68,6 +69,8 @@ export class PolicyEngine {
         return this.evaluateAllowlist(rule as AllowlistRule, opts);
       case "session_key":
         return this.evaluateSessionKey(rule as SessionKeyPolicyRule, opts);
+      case "timebounds":
+        return this.evaluateTimeBounds(rule as TimeBoundsRule, opts);
       default:
         return { approved: true };
     }
@@ -94,7 +97,6 @@ export class PolicyEngine {
       return { approved: true };
     }
 
-    // Initialize tracking for this wallet if needed
     if (!this.spendTracking.has(walletAddress)) {
       this.spendTracking.set(walletAddress, new Map());
     }
@@ -107,18 +109,15 @@ export class PolicyEngine {
     }
     const track = walletTrack.get(trackKey)!;
 
-    // Check per-transaction limit
-    if (txAmount > parseFloat(rule.maxPerTx)) {
-      return { approved: false, reason: `Transaction amount ${txAmount} exceeds per-tx limit ${rule.maxPerTx}` };
+    if (track.dailyTotal + totalAmount > parseFloat(rule.maxDaily)) {
+      return {
+        approved: false,
+        reason: `Daily spending ${track.dailyTotal + totalAmount} exceeds limit ${rule.maxDaily}`,
+      };
     }
 
-    // Check daily limit
-    track.dailyTotal += txAmount;
+    track.dailyTotal += totalAmount;
     track.txCount++;
-
-    if (track.dailyTotal > parseFloat(rule.maxDaily)) {
-      return { approved: false, reason: `Daily spending ${track.dailyTotal} exceeds limit ${rule.maxDaily}` };
-    }
 
     return { approved: true };
   }
@@ -214,6 +213,59 @@ export class PolicyEngine {
     }
 
     this.sessionSpendTracking.set(rule.sessionPublicKey, currentSpend + txAmount);
+    return { approved: true };
+  }
+
+  private evaluateTimeBounds(rule: TimeBoundsRule, opts: EvaluateOpts): EvaluateResult {
+    const timeBounds = opts.transaction.timeBounds;
+    if (!timeBounds) {
+      if (rule.allowUnbounded) {
+        return { approved: true };
+      }
+      return {
+        approved: false,
+        reason: "Transaction does not have required TimeBounds",
+      };
+    }
+
+    const now = Math.floor(Date.now() / 1000);
+    const minTime = parseInt(timeBounds.minTime, 10);
+    const maxTime = parseInt(timeBounds.maxTime, 10);
+
+    if (maxTime === 0) {
+      if (!rule.allowUnbounded) {
+        return {
+          approved: false,
+          reason: "Transaction maxTime is 0 (unbounded), which is prohibited by policy",
+        };
+      }
+      return { approved: true };
+    }
+
+    if (maxTime <= now) {
+      return {
+        approved: false,
+        reason: `Transaction has expired: maxTime (${maxTime}) <= current time (${now})`,
+      };
+    }
+
+    if (minTime > now + 300) {
+      return {
+        approved: false,
+        reason: `Transaction minTime (${minTime}) is in the future`,
+      };
+    }
+
+    if (rule.maxWindowSeconds && rule.maxWindowSeconds > 0) {
+      const window = maxTime - (minTime > 0 ? minTime : now);
+      if (window > rule.maxWindowSeconds) {
+        return {
+          approved: false,
+          reason: `Transaction validity window of ${window}s exceeds policy limit of ${rule.maxWindowSeconds}s`,
+        };
+      }
+    }
+
     return { approved: true };
   }
 }

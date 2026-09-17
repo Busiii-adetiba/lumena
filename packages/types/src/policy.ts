@@ -9,7 +9,8 @@ export type PolicyRule =
   | SpendLimit
   | VelocityRule
   | AllowlistRule
-  | SessionKeyPolicyRule;
+  | SessionKeyPolicyRule
+  | TimeBoundsRule;
 
 export interface SpendLimit {
   type: "spend_limit";

@@ -6,12 +6,13 @@ import {
   PasskeyManager,
   type PasskeyRegistrationOpts,
 } from "@lumen/core";
-import type { StellarNetwork } from "@lumen/types";
+import type { StellarNetwork, ContractSimulationResult } from "@lumen/types";
 
 export interface LumenClientOpts {
   network?: StellarNetwork;
   horizonUrl?: string;
   rpcUrl?: string;
+  serverUrl?: string;
   sponsorSecret: string;
   serverPublicKey: string;
 }
@@ -45,6 +46,7 @@ export class LumenClient {
   private client: StellarClient;
   private sponsorKeypair: Keypair;
   private serverPublicKey: string;
+  private serverUrl?: string;
   private wallets: Map<string, Wallet> = new Map();
 
   constructor(opts: LumenClientOpts) {
@@ -55,6 +57,7 @@ export class LumenClient {
     });
     this.sponsorKeypair = Keypair.fromSecret(opts.sponsorSecret);
     this.serverPublicKey = opts.serverPublicKey;
+    this.serverUrl = opts.serverUrl;
   }
 
   createSessionKey(durationSeconds: number = 3600): SessionKeyInfo {
@@ -165,7 +168,66 @@ export class LumenClient {
       asset = knownAsset;
     }
 
+    if (this.serverUrl) {
+      const signedXdr = await wallet.buildPaymentTransaction(destination, asset, amount);
+
+      const cosignRes = await fetch(`${this.serverUrl}/cosign`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          xdr: signedXdr,
+          walletAddress: wallet.address,
+        }),
+      });
+
+      if (!cosignRes.ok) {
+        const errorData = await cosignRes.json().catch(() => ({}));
+        throw new Error(errorData.error ?? `Cosign rejected with status ${cosignRes.status}`);
+      }
+
+      const { signedXdr: fullySignedXdr } = await cosignRes.json();
+
+      const submitRes = await fetch(`${this.serverUrl}/fee-bump/submit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          xdr: fullySignedXdr,
+        }),
+      });
+
+      if (!submitRes.ok) {
+        const errorData = await submitRes.json().catch(() => ({}));
+        throw new Error(errorData.error ?? `Fee-bump submit failed with status ${submitRes.status}`);
+      }
+
+      const result = await submitRes.json();
+      return { hash: result.hash };
+    }
+
     return wallet.send(destination, asset, amount);
+  }
+
+  async simulateContract(
+    id: string,
+    contractId: string,
+    method: string,
+    args?: any[]
+  ): Promise<ContractSimulationResult> {
+    const wallet = this.wallets.get(id);
+    if (!wallet) throw new Error(`Wallet not found: ${id}`);
+    return wallet.simulateContract(contractId, method, args);
+  }
+
+  async invokeContract(
+    id: string,
+    contractId: string,
+    method: string,
+    args?: any[],
+    fee?: string
+  ): Promise<{ hash: string }> {
+    const wallet = this.wallets.get(id);
+    if (!wallet) throw new Error(`Wallet not found: ${id}`);
+    return wallet.invokeContract(contractId, method, args, fee);
   }
 }
 

@@ -17,7 +17,7 @@ export async function createSponsoredAccount(opts: CreateAccountOpts): Promise<{
   hash: string;
   address: string;
 }> {
-  const { client, sponsorKeypair, newAccountKeypair, startingBalance = "0" } = opts;
+  const { client, sponsorKeypair, newAccountKeypair, startingBalance = "10" } = opts;
 
   const sponsorAccount = await client.horizon.loadAccount(sponsorKeypair.publicKey());
 
@@ -36,7 +36,11 @@ export async function createSponsoredAccount(opts: CreateAccountOpts): Promise<{
         startingBalance,
       })
     )
-    .addOperation(Operation.endSponsoringFutureReserves())
+    .addOperation(
+      Operation.endSponsoringFutureReserves({
+        source: newAccountKeypair.publicKey(),
+      })
+    )
     .setTimeout(180)
     .build();
 

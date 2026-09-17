@@ -8,7 +8,7 @@ import { KeyManager } from "../keys/manager.js";
 import { Wallet } from "../wallet/wallet.js";
 
 const HORIZON_URL = process.env.HORIZON_URL ?? "http://localhost:8000";
-const RPC_URL = process.env.RPC_URL ?? "http://localhost:8000";
+const RPC_URL = process.env.RPC_URL ?? "http://localhost:8000/rpc";
 
 async function isLocalNetworkAvailable(): Promise<boolean> {
   try {
@@ -27,6 +27,25 @@ function getClient() {
     horizonUrl: HORIZON_URL,
     rpcUrl: RPC_URL,
   });
+}
+
+const client = getClient();
+
+async function fundAccount(pubkey: string) {
+  try {
+    const res = await fetch(`${HORIZON_URL}/friendbot?addr=${pubkey}`);
+    await res.json().catch(() => {});
+  } catch {
+    await client.rpc.requestAirdrop(pubkey);
+  }
+  for (let i = 0; i < 30; i++) {
+    try {
+      await client.horizon.loadAccount(pubkey);
+      return;
+    } catch {
+      await new Promise((r) => setTimeout(r, 500));
+    }
+  }
 }
 
 describe("StellarClient", () => {
@@ -52,7 +71,7 @@ describeNetwork("createSponsoredAccount", () => {
     const newAccount = Keypair.random();
 
     // Fund sponsor on local network
-    await client.rpc.requestAirdrop(sponsor.publicKey());
+    await fundAccount(sponsor.publicKey());
 
     const result = await createSponsoredAccount({
       client,
@@ -77,7 +96,7 @@ describeNetwork("setupMultisig", () => {
     const account = Keypair.random();
     const coSigner = Keypair.random();
 
-    await client.rpc.requestAirdrop(sponsor.publicKey());
+    await fundAccount(sponsor.publicKey());
 
     // Create account
     await createSponsoredAccount({
@@ -115,7 +134,8 @@ describeNetwork("buildFeeBump", () => {
     const source = Keypair.random();
     const destination = Keypair.random();
 
-    await client.rpc.requestAirdrop(sponsor.publicKey());
+    await fundAccount(sponsor.publicKey());
+    await fundAccount(destination.publicKey());
     await createSponsoredAccount({
       client,
       sponsorKeypair: sponsor,
@@ -194,7 +214,7 @@ describeNetwork("Wallet", () => {
     const sponsor = Keypair.random();
     const coSigner = Keypair.random();
 
-    await client.rpc.requestAirdrop(sponsor.publicKey());
+    await fundAccount(sponsor.publicKey());
 
     const wallet = new Wallet({
       client,
