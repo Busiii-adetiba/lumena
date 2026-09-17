@@ -8,6 +8,7 @@ export interface WalletOpts {
   client: StellarClient;
   sponsorKeypair: Keypair;
   serverPublicKey: string;
+  ownerKeypair?: Keypair;
 }
 
 export class Wallet {
@@ -17,11 +18,13 @@ export class Wallet {
   private keyManager: KeyManager;
   private _address: string | null = null;
   private _keypair: Keypair | null = null;
+  private initialOwnerKeypair?: Keypair;
 
   constructor(opts: WalletOpts) {
     this.client = opts.client;
     this.sponsorKeypair = opts.sponsorKeypair;
     this.serverPublicKey = opts.serverPublicKey;
+    this.initialOwnerKeypair = opts.ownerKeypair;
     this.keyManager = new KeyManager();
   }
 
@@ -31,7 +34,7 @@ export class Wallet {
   }
 
   async create(): Promise<{ address: string; publicKey: string }> {
-    this._keypair = this.keyManager.generateKeypair();
+    this._keypair = this.initialOwnerKeypair ?? this.keyManager.generateKeypair();
 
     await createSponsoredAccount({
       client: this.client,
@@ -93,6 +96,29 @@ export class Wallet {
     }
 
     throw new Error(`Payment failed: ${result.hash}`);
+  }
+
+  async buildPaymentTransaction(destination: string, asset: Asset, amount: string): Promise<string> {
+    if (!this._keypair) throw new Error("Wallet not initialized");
+
+    const account = await this.client.horizon.loadAccount(this.address);
+
+    const tx = new TransactionBuilder(account, {
+      fee: BASE_FEE,
+      networkPassphrase: this.client.networkPassphrase,
+    })
+      .addOperation(
+        Operation.payment({
+          destination,
+          asset,
+          amount,
+        })
+      )
+      .setTimeout(180)
+      .build();
+
+    tx.sign(this._keypair);
+    return tx.toXDR();
   }
 
   getAddress(): string {
