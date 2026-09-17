@@ -26,3 +26,23 @@ export interface Signer {
    */
   sign(payload: Uint8Array): Promise<Uint8Array>;
 }
+
+export interface GcpKmsSignerConfig {
+  projectId?: string;
+  locationId?: string;
+  keyRingId?: string;
+  keyId?: string;
+  keyVersion?: string;
+  /** Full resource name, e.g. projects/.../locations/.../keyRings/.../cryptoKeys/.../cryptoKeyVersions/... */
+  keyResourceName?: string;
+  endpoint?: string;
+}
+
+export interface VaultSignerConfig {
+  vaultUrl: string;
+  token: string;
+  keyName: string;
+  mountPath?: string; // defaults to 'transit'
+  namespace?: string;
+}
+
