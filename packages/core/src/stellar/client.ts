@@ -20,7 +20,7 @@ const NETWORKS: Record<StellarNetwork, StellarConfig> = {
   local: {
     network: "local",
     horizonUrl: "http://localhost:8000",
-    rpcUrl: "http://localhost:8000",
+    rpcUrl: "http://localhost:8000/rpc",
     networkPassphrase: Networks.STANDALONE,
   },
 };
@@ -46,7 +46,7 @@ export class StellarClient {
       rpcUrl: opts.rpcUrl ?? defaults.rpcUrl,
     };
 
-    this.horizon = new Horizon.Server(this.config.horizonUrl);
+    this.horizon = new Horizon.Server(this.config.horizonUrl, { allowHttp: this.config.network === "local" });
     this.rpc = new sorobanRpc.Server(this.config.rpcUrl, { allowHttp: this.config.network === "local" });
   }
 
