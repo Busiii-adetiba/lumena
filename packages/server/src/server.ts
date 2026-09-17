@@ -97,6 +97,17 @@ export function createServer(opts: ServerOpts): ServerResult {
   app.use(express.json());
 
   app.use((req: Request, res: Response, next: NextFunction) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, x-request-id");
+    if (req.method === "OPTIONS") {
+      res.sendStatus(204);
+      return;
+    }
+    next();
+  });
+
+  app.use((req: Request, res: Response, next: NextFunction) => {
     if (req.id) {
       res.setHeader("x-request-id", req.id as string);
     }
@@ -118,7 +129,7 @@ export function createServer(opts: ServerOpts): ServerResult {
   app.get("/health", wrapHandler(async (_req, res) => {
     let horizonConnected = false;
     try {
-      await client.horizon.server.fetchTime();
+      await client.horizon.fetchBaseFee();
       horizonConnected = true;
     } catch {
       horizonConnected = false;
@@ -235,7 +246,7 @@ export function createServer(opts: ServerOpts): ServerResult {
 
   app.use(errorHandler);
 
-  const server = createHttpServer(app);
+  const server = createHttpServer(app as any);
 
   server.listen(port, () => {
     logger.info({ port, network: client.config.network }, `Lumen server listening on port ${port}`);

@@ -29,9 +29,9 @@ export const logger = pino({
   },
 });
 
-export const httpLogger = pinoHttp({
+export const httpLogger = (pinoHttp as any)({
   logger,
-  genReqId: (req) => (req.headers["x-request-id"] as string) || randomUUID(),
+  genReqId: (req: any) => (req.headers["x-request-id"] as string) || randomUUID(),
   customAttributeKeys: {
     req: "req",
     res: "res",

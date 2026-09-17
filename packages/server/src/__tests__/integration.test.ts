@@ -8,7 +8,7 @@ import { createSpendLimitPolicy, createAllowlistPolicy } from "../policy/rules.j
 import { EnvSigner } from "../signers/EnvSigner.js";
 
 const HORIZON_URL = process.env.HORIZON_URL ?? "http://localhost:8000";
-const RPC_URL = process.env.RPC_URL ?? "http://localhost:8000";
+const RPC_URL = process.env.RPC_URL ?? "http://localhost:8000/rpc";
 
 function getClient() {
   return new StellarClient({
@@ -177,6 +177,7 @@ describe("FeeSponsorService", () => {
 
     await client.rpc.requestAirdrop(feePayer.publicKey());
     await client.rpc.requestAirdrop(sponsor.publicKey());
+    await client.rpc.requestAirdrop(destination.publicKey());
 
     await createSponsoredAccount({
       client,

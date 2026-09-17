@@ -13,8 +13,9 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@lumen/types": "workspace:*",
+    "@aws-sdk/client-kms": "^3.1133.0",
     "@lumen/core": "workspace:*",
+    "@lumen/types": "workspace:*",
     "@stellar/stellar-sdk": "^16.0.1",
     "express": "^5.1.0",
     "pino": "^9.6.0",
