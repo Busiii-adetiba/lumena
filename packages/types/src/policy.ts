@@ -36,3 +36,20 @@ export interface SessionKeyPolicyRule {
   expiresAt: number;
 }
 
+export interface PolicyStore {
+  getPolicy(walletId: string): Promise<Policy | null>;
+  savePolicy(policy: Policy): Promise<void>;
+  deletePolicy(walletId: string): Promise<void>;
+  recordSpend(
+    walletId: string,
+    date: string,
+    amount: number,
+    asset?: string
+  ): Promise<{ dailyTotal: number; txCount: number }>;
+  recordVelocity(
+    walletId: string,
+    timestamp: number,
+    windowMs: number
+  ): Promise<number>;
+}
+
