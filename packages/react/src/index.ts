@@ -13,3 +13,6 @@ export type {
   SendPaymentResult,
   UseSendPaymentResult,
 } from "./use-send-payment.js";
+
+export { usePolicy } from "./use-policy.js";
+export type { UsePolicyResult, WalletPolicy } from "./use-policy.js";
