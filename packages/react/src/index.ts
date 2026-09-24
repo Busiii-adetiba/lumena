@@ -16,3 +16,10 @@ export type {
 
 export { usePolicy } from "./use-policy.js";
 export type { UsePolicyResult, WalletPolicy } from "./use-policy.js";
+
+export { useSponsorStatus } from "./use-sponsor-status.js";
+export type {
+  SponsorStatus,
+  UseSponsorStatusOptions,
+  UseSponsorStatusResult,
+} from "./use-sponsor-status.js";
