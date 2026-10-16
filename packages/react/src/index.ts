@@ -1,6 +1,8 @@
 export { LumenProvider, useLumen } from "./context.js";
 export type { LumenContextValue, LumenProviderProps } from "./context.js";
 
+export { useIsMounted } from "./hooks/use-is-mounted.js";
+
 export { useWallet } from "./use-wallet.js";
 export type { UseWalletResult } from "./use-wallet.js";
 
@@ -61,3 +63,11 @@ export type { LumenBalanceProps } from "./components/LumenBalance.js";
 
 export { LumenWalletCard } from "./components/LumenWalletCard.js";
 export type { LumenWalletCardProps } from "./components/LumenWalletCard.js";
+
+export { LumenConnectModal } from "./components/LumenConnectModal.js";
+export type {
+  ConnectWalletResult,
+  LumenConnectModalProps,
+  LumenConnectModalTab,
+  LumenConnectModalTheme,
+} from "./components/LumenConnectModal.js";

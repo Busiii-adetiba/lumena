@@ -71,4 +71,35 @@ describe("useCreateWalletWithPasskey", () => {
     expect(hookResult.current.error).toBeNull();
     expect(hookResult.current.loading).toBe(false);
   });
+
+  it("fails with a clear error when called before hydration (SSR guard)", async () => {
+    const createWalletWithPasskey = vi.fn();
+    const client = { createWalletWithPasskey } as unknown as LumenClient;
+
+    // Simulate the pre-hydration state: provider mounted on the server where
+    // isMounted is still false.
+    const { LumenContext } = await import("./context.js");
+    function ssrWrapper({ children }: { children: React.ReactNode }) {
+      return (
+        <LumenContext.Provider value={{ client, isMounted: false }}>
+          {children}
+        </LumenContext.Provider>
+      );
+    }
+
+    const { result: hookResult } = renderHook(() => useCreateWalletWithPasskey(), {
+      wrapper: ssrWrapper,
+    });
+
+    await act(async () => {
+      await expect(hookResult.current.createWalletWithPasskey()).rejects.toThrow(
+        "requires a browser environment",
+      );
+    });
+
+    // The browser client must never be touched during SSR.
+    expect(createWalletWithPasskey).not.toHaveBeenCalled();
+    expect(hookResult.current.error?.message).toContain("browser environment");
+    expect(hookResult.current.loading).toBe(false);
+  });
 });

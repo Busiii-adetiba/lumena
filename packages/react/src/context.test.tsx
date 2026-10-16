@@ -17,6 +17,18 @@ describe("LumenProvider", () => {
     expect(result.current.client).toBe(client);
   });
 
+  it("provides isMounted=true after the provider mounts (SSR-safe)", () => {
+    const client = {} as LumenClient;
+
+    const { result } = renderHook(() => useLumen(), {
+      wrapper: ({ children }) => (
+        <LumenProvider client={client}>{children}</LumenProvider>
+      ),
+    });
+
+    expect(result.current.isMounted).toBe(true);
+  });
+
   it("throws when useLumen is used outside the provider", () => {
     expect(() => renderHook(() => useLumen())).toThrow(
       "useLumen must be used within a LumenProvider"
