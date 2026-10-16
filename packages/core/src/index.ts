@@ -47,6 +47,52 @@ export {
 export { toScVal, fromScVal } from "./soroban/scval.js";
 export { ContractClient } from "./soroban/client.js";
 export {
+  Sep24Client,
+  type Sep24AssetInfo,
+  type Sep24Info,
+  type Sep24FlowKind,
+  type Sep24InteractiveOpts,
+  type Sep24InteractiveResult,
+  type Sep24TransactionStatus,
+  type Sep24Transaction,
+  type Sep24PollOpts,
+} from "./stellar/sep24.js";
+export {
+  encodeMuxedAddress,
+  decodeMuxedAddress,
+  resolveBasePublicKey,
+  isMuxedAddress,
+  buildMuxedPayment,
+  isPolicyAllowed,
+  isPolicyDenied,
+  type DecodedMuxedAddress,
+  type MuxedPaymentOpts,
+  type MuxedPaymentResult,
+} from "./stellar/muxed.js";
+export {
+  FeeEstimator,
+  buildDynamicFeeBump,
+  type FeePercentiles,
+  type HorizonFeeStats,
+  type FeeEstimatorOptions,
+  type FeeEstimate,
+  type DynamicFeeBumpOpts,
+} from "./stellar/fees.js";
+export {
+  extractCustomSection,
+  parseContractMeta,
+  parseContractSpec,
+  generateTypeScript,
+  type ContractEnvMeta,
+  type ContractFunction,
+  type ContractFunctionArg,
+  type ContractFunctionOutput,
+  type ContractSpec,
+  type ContractStructField,
+  type ContractEnumVariant,
+  type ContractTypeSpec,
+} from "./soroban/metadata.js";
+export {
   InMemoryWalletRegistry,
   RedisWalletRegistry,
   type WalletRegistry,
