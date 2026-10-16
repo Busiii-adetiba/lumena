@@ -26,6 +26,7 @@ export type {
   UseSponsorStatusOptions,
   UseSponsorStatusResult,
 } from "./use-sponsor-status.js";
+
 export { useInvokeContract } from "./use-invoke-contract.js";
 export type {
   InvokeContractParams,
@@ -41,6 +42,20 @@ export type { Transaction, UseTransactionHistoryResult } from "./use-transaction
 
 export { useSessionKey } from "./use-session-key.js";
 export type { SessionKeyState } from "./use-session-key.js";
+
+// #279 — Multi-device co-signing sessions
+export { useMultiSigApproval } from "./use-multisig-approval.js";
+export type {
+  MultiSigSession,
+  MultiSigSessionStatus,
+  UseMultiSigApprovalOptions,
+  UseMultiSigApprovalResult,
+} from "./use-multisig-approval.js";
+
+// #281 — i18n framework
+export { useTranslation, resolveTranslations, translations } from "./i18n/index.js";
+export type { LumenLocale, LumenTranslations, LumenI18nContextValue } from "./i18n/index.js";
+
 export { LumenBalance } from "./components/LumenBalance.js";
 export type { LumenBalanceProps } from "./components/LumenBalance.js";
 
