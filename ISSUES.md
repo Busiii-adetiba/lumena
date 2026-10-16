@@ -1,4 +1,4 @@
-# Open Issues & Development Roadmap
+﻿# Open Issues & Development Roadmap
 
 Welcome to the **Lumen** open-source roadmap! We welcome contributions from developers of all skill levels. Whether you are looking for a `good first issue` or a complex architecture challenge, there is an open issue for you.
 
@@ -13,10 +13,10 @@ To start contributing:
 
 ## Issue Directory
 
-### Completed Core Issues (Batch #1 – #20)
+### Completed Core Issues (Batch #1 - #20)
 
 | # | Issue Title | Category | Status | GitHub Link |
-|---|---|---|---|---|
+|---|---|---|---|---|---|
 | 1 | `[Feature] Redis / Database Persistence Driver for PolicyEngine` | Server / Architecture | `Completed` | [#1](https://github.com/utilityjnr1/lumena/issues/1) |
 | 2 | `[Security] Multi-Operation & Path Payment Validation in PolicyEngine` | Security / Engine | `Completed` | [#2](https://github.com/utilityjnr1/lumena/issues/2) |
 | 3 | `[Feature] Asset-Specific Spend Limits in PolicyEngine` | Policy Engine | `Completed` | [#3](https://github.com/utilityjnr1/lumena/issues/3) |
@@ -38,10 +38,10 @@ To start contributing:
 | 19 | `[Testing] End-to-End E2E Browser Test Suite with Playwright` | Testing | `Completed` | [#19](https://github.com/utilityjnr1/lumena/issues/19) |
 | 20 | `[CI/CD] GitHub Actions Workflows & Issue Templates` | CI/CD / DevOps | `Completed` | [#20](https://github.com/utilityjnr1/lumena/issues/20) |
 
-### Previous Contributor Issues (Batch #162 – #191)
+### Previous Contributor Issues (Batch #162 - #191)
 
 | # | Issue Title | Category | Status | GitHub Link |
-|---|---|---|---|---|
+|---|---|---|---|---|---|
 | 162 | `[Feature] Add BIP-39 mnemonic phrase wallet generation and recovery to KeyManager` | Core / Keys | `Completed` | [#162](https://github.com/utilityjnr1/lumena/issues/162) |
 | 163 | `[Feature] Add revokeSessionKey helper function to @lumen/core` | Core / Stellar | `Completed` | [#163](https://github.com/utilityjnr1/lumena/issues/163) |
 | 164 | `[Feature] Support Futurenet network configuration in StellarClient` | Core / Soroban | `Completed` | [#164](https://github.com/utilityjnr1/lumena/issues/164) |
@@ -75,137 +75,137 @@ To start contributing:
 
 ---
 
-## Active Contributor Issues (Batch #213 – #312: High-Impact Ecosystem Roadmap)
+## Active Contributor Issues (Batch #213 - #312: High-Impact Ecosystem Roadmap)
 
 This major batch of 100 high-impact open issues covers critical engineering priorities across **Soroban Smart Contracts**, **Backend High-Throughput Scaling & Security**, **Frontend SDK & UI Components**, **Core Cryptography & Stellar Protocols**, and **DevOps & Tooling**. Every issue is detailed with technical context, implementation requirements, and acceptance criteria.
 
-### Index of Active Batch Issues (#213 – #312)
+### Index of Active Batch Issues (#213 - #312)
 
-#### Part 1: Soroban Smart Contracts & On-Chain Account Abstraction (#213 – #232)
-| # | Issue Title | Category | Complexity | Status |
-|---|---|---|---|---|
-| 213 | `[Contract] Native Soroban Smart Account Contract with Pluggable Signers and WebAuthn Verification` | Soroban / Contracts | `Advanced` | `Open` |
-| 214 | `[Contract] Gasless Paymaster Contract for Soroban Invocations with Fee Sponsorship Ledger` | Soroban / Contracts | `Advanced` | `Open` |
-| 215 | `[Contract] On-Chain Session Key Delegation Contract with Granular Method and Resource Whitelists` | Soroban / Contracts | `Intermediate` | `Open` |
-| 216 | `[Contract] Social Recovery and Guardian Timelock Smart Contract for Account Ownership Restoral` | Soroban / Contracts | `Advanced` | `Open` |
-| 217 | `[Contract] SEP-41 Fungible Token Smart Contract Implementation with Comprehensive Mock Test Harness` | Soroban / Contracts | `Intermediate` | `Open` |
-| 218 | `[Contract] Daily Rate-Limited Spending and Allowance Soroban Contract` | Soroban / Contracts | `Intermediate` | `Open` |
-| 219 | `[Contract] Soroban State Archival and Automatic TTL Extension Manager` | Soroban / Contracts | `Advanced` | `Open` |
-| 220 | `[Contract] Multi-Token Escrow and Conditional Settlement Soroban Contract` | Soroban / Contracts | `Intermediate` | `Open` |
-| 221 | `[Contract] Reentrancy Guard and Invariant Assertion Module for Soroban Contracts` | Soroban / Contracts | `Intermediate` | `Open` |
-| 222 | `[Contract] Cross-Contract Invocation Policy Validator with Dynamic Call Graph Inspection` | Soroban / Contracts | `Advanced` | `Open` |
-| 223 | `[Contract] Oracle Price-Feed Consumer Contract for Real-Time USD Spend Limit Enforcement` | Soroban / Contracts | `Advanced` | `Open` |
-| 224 | `[Contract] Upgradeable Proxy Pattern and State Migration Harness for Soroban Smart Accounts` | Soroban / Contracts | `Advanced` | `Open` |
-| 225 | `[Contract] Dead-Man's Switch and Inheritance Vault Soroban Contract` | Soroban / Contracts | `Intermediate` | `Open` |
-| 226 | `[Contract] Threshold Multi-Party ECDSA / Ed25519 Quorum Verifier Contract` | Soroban / Cryptography | `Advanced` | `Open` |
-| 227 | `[Contract] Gasless Non-Fungible Soulbound Identity Token (SBT) Contract for KYC / Policy Attestation` | Soroban / Tokens | `Intermediate` | `Open` |
-| 228 | `[Contract] Automated Batch Settlement and Micro-Payment Streaming Contract` | Soroban / DeFi | `Advanced` | `Open` |
-| 229 | `[Contract] Soroban Contract Event Schema Standard and Structured Topic Indexer` | Soroban / Indexing | `Intermediate` | `Open` |
-| 230 | `[Contract] Soroban Gas and Resource Footprint Profiling Test Suite` | Soroban / Performance | `Intermediate` | `Open` |
-| 231 | `[Contract] Fuzz Testing and Invariant Verification Suite for Smart Account Storage` | Soroban / Testing | `Advanced` | `Open` |
-| 232 | `[Contract] WASM Binary Size Optimization and Strip Pipeline in Docker Build` | Soroban / Build | `Intermediate` | `Open` |
+#### Part 1: Soroban Smart Contracts & On-Chain Account Abstraction (#213 - #232)
+| # | Issue Title | Category | Complexity | Status | GitHub Link |
+|---|---|---|---|---|---|
+| 213 | `[Contract] Native Soroban Smart Account Contract with Pluggable Signers and WebAuthn Verification` | Soroban / Contracts | `Advanced` | `Open` | [#213](https://github.com/utilityjnr1/lumena/issues/213) |
+| 214 | `[Contract] Gasless Paymaster Contract for Soroban Invocations with Fee Sponsorship Ledger` | Soroban / Contracts | `Advanced` | `Open` | [#214](https://github.com/utilityjnr1/lumena/issues/214) |
+| 215 | `[Contract] On-Chain Session Key Delegation Contract with Granular Method and Resource Whitelists` | Soroban / Contracts | `Intermediate` | `Open` | [#215](https://github.com/utilityjnr1/lumena/issues/215) |
+| 216 | `[Contract] Social Recovery and Guardian Timelock Smart Contract for Account Ownership Restoral` | Soroban / Contracts | `Advanced` | `Open` | [#216](https://github.com/utilityjnr1/lumena/issues/216) |
+| 217 | `[Contract] SEP-41 Fungible Token Smart Contract Implementation with Comprehensive Mock Test Harness` | Soroban / Contracts | `Intermediate` | `Open` | [#217](https://github.com/utilityjnr1/lumena/issues/217) |
+| 218 | `[Contract] Daily Rate-Limited Spending and Allowance Soroban Contract` | Soroban / Contracts | `Intermediate` | `Open` | [#218](https://github.com/utilityjnr1/lumena/issues/218) |
+| 219 | `[Contract] Soroban State Archival and Automatic TTL Extension Manager` | Soroban / Contracts | `Advanced` | `Open` | [#219](https://github.com/utilityjnr1/lumena/issues/219) |
+| 220 | `[Contract] Multi-Token Escrow and Conditional Settlement Soroban Contract` | Soroban / Contracts | `Intermediate` | `Open` | [#220](https://github.com/utilityjnr1/lumena/issues/220) |
+| 221 | `[Contract] Reentrancy Guard and Invariant Assertion Module for Soroban Contracts` | Soroban / Contracts | `Intermediate` | `Open` | [#221](https://github.com/utilityjnr1/lumena/issues/221) |
+| 222 | `[Contract] Cross-Contract Invocation Policy Validator with Dynamic Call Graph Inspection` | Soroban / Contracts | `Advanced` | `Open` | [#222](https://github.com/utilityjnr1/lumena/issues/222) |
+| 223 | `[Contract] Oracle Price-Feed Consumer Contract for Real-Time USD Spend Limit Enforcement` | Soroban / Contracts | `Advanced` | `Open` | [#223](https://github.com/utilityjnr1/lumena/issues/223) |
+| 224 | `[Contract] Upgradeable Proxy Pattern and State Migration Harness for Soroban Smart Accounts` | Soroban / Contracts | `Advanced` | `Open` | [#224](https://github.com/utilityjnr1/lumena/issues/224) |
+| 225 | `[Contract] Dead-Man's Switch and Inheritance Vault Soroban Contract` | Soroban / Contracts | `Intermediate` | `Open` | [#225](https://github.com/utilityjnr1/lumena/issues/225) |
+| 226 | `[Contract] Threshold Multi-Party ECDSA / Ed25519 Quorum Verifier Contract` | Soroban / Cryptography | `Advanced` | `Open` | [#226](https://github.com/utilityjnr1/lumena/issues/226) |
+| 227 | `[Contract] Gasless Non-Fungible Soulbound Identity Token (SBT) Contract for KYC / Policy Attestation` | Soroban / Tokens | `Intermediate` | `Open` | [#227](https://github.com/utilityjnr1/lumena/issues/227) |
+| 228 | `[Contract] Automated Batch Settlement and Micro-Payment Streaming Contract` | Soroban / DeFi | `Advanced` | `Open` | [#228](https://github.com/utilityjnr1/lumena/issues/228) |
+| 229 | `[Contract] Soroban Contract Event Schema Standard and Structured Topic Indexer` | Soroban / Indexing | `Intermediate` | `Open` | [#229](https://github.com/utilityjnr1/lumena/issues/229) |
+| 230 | `[Contract] Soroban Gas and Resource Footprint Profiling Test Suite` | Soroban / Performance | `Intermediate` | `Open` | [#230](https://github.com/utilityjnr1/lumena/issues/230) |
+| 231 | `[Contract] Fuzz Testing and Invariant Verification Suite for Smart Account Storage` | Soroban / Testing | `Advanced` | `Open` | [#231](https://github.com/utilityjnr1/lumena/issues/231) |
+| 232 | `[Contract] WASM Binary Size Optimization and Strip Pipeline in Docker Build` | Soroban / Build | `Intermediate` | `Open` | [#232](https://github.com/utilityjnr1/lumena/issues/232) |
 
-#### Part 2: Backend Architecture, Server Scaling & Security (#233 – #257)
-| # | Issue Title | Category | Complexity | Status |
-|---|---|---|---|---|
-| 233 | `[Backend] Distributed Sequence Number Reservation & Concurrency Queue Using Redis Redlock` | Server / Concurrency | `Advanced` | `Open` |
-| 234 | `[Backend] Multi-Tenant API Key Management with Scoped Permissions and Tiered Rate Quotas` | Server / Auth | `Intermediate` | `Open` |
-| 235 | `[Backend] SEP-10 Web Authentication Protocol Endpoint with JWT Issuance and Challenge Verification` | Server / Auth | `Advanced` | `Open` |
-| 236 | `[Backend] Webhook Dispatcher Retry Pipeline with Exponential Backoff and Dead-Letter Queue (DLQ)` | Server / Webhooks | `Intermediate` | `Open` |
-| 237 | `[Backend] OpenTelemetry Distributed Tracing Integration Across HTTP, Redis, and Stellar RPC` | Server / Observability | `Intermediate` | `Open` |
-| 238 | `[Backend] Dynamic Policy Engine Reload via Redis Pub/Sub Without Server Restarts` | Server / Policy | `Intermediate` | `Open` |
-| 239 | `[Backend] Hardware Security Module (HSM) PKCS#11 Signer Implementation for Enterprise Custody` | Server / Security | `Advanced` | `Open` |
-| 240 | `[Backend] Multi-Region Stellar Horizon & RPC Latency-Aware Failover Router` | Server / Stellar | `Advanced` | `Open` |
-| 241 | `[Backend] Real-Time Anomaly and Fraud Detection Service for Velocity Spikes and Geo-IP Shifts` | Server / Security | `Advanced` | `Open` |
-| 242 | `[Backend] Relational Database Persistence Layer (Prisma/PostgreSQL) for Policies and Audit Trails` | Server / Database | `Advanced` | `Open` |
-| 243 | `[Backend] Batch Cosigning Endpoint (POST /cosign/batch) with Atomic Policy Evaluation` | Server / API | `Intermediate` | `Open` |
-| 244 | `[Backend] Sliding-Window Token Bucket Rate Limiter per Wallet Address and Client IP` | Server / Middleware | `Intermediate` | `Open` |
-| 245 | `[Backend] RFC 7231 Idempotency-Key Support Across All Mutating Server Endpoints` | Server / Reliability | `Intermediate` | `Open` |
-| 246 | `[Backend] Granular Role-Based Access Control (RBAC) and Audit Logging for Admin APIs` | Server / Security | `Intermediate` | `Open` |
-| 247 | `[Backend] Graceful Shutdown Lifecycle Handler with In-Flight Transaction Draining` | Server / DevOps | `Intermediate` | `Open` |
-| 248 | `[Backend] Tamper-Proof Cryptographic Audit Log with Merkle Tree Hash Chaining` | Server / Cryptography | `Advanced` | `Open` |
-| 249 | `[Backend] Prometheus Alerting Rules, SLO Dashboards, and PagerDuty Webhook Integration` | Server / DevOps | `Intermediate` | `Open` |
-| 250 | `[Backend] WebSocket Server for Live Transaction Broadcasts, Confirmations, and Policy Events` | Server / Realtime | `Intermediate` | `Open` |
-| 251 | `[Backend] Hardened Production Docker Image with Multi-Stage Build and Non-Root User` | Server / Docker | `Intermediate` | `Open` |
-| 252 | `[Backend] Automatic Sponsor Hot-Wallet Refill Service via Exchange API and Horizon Listener` | Server / Sponsor | `Advanced` | `Open` |
-| 253 | `[Backend] Transaction Ingestion and Ledger Reconciliation Worker with Horizon Streaming` | Server / Ledger | `Advanced` | `Open` |
-| 254 | `[Backend] Anti-Replay Nonce Validation and Transaction Cache in Memory and Redis` | Server / Security | `Intermediate` | `Open` |
-| 255 | `[Backend] Dynamic CORS Domain Whitelist Provider with Live Database Backing` | Server / Security | `Beginner` | `Open` |
-| 256 | `[Backend] Health Diagnostics Self-Test Suite and Live Dependency Probing (/health/deep)` | Server / Reliability | `Intermediate` | `Open` |
-| 257 | `[Backend] GraphQL API Gateway with Subscriptions alongside Existing Express REST Endpoints` | Server / API | `Advanced` | `Open` |
+#### Part 2: Backend Architecture, Server Scaling & Security (#233 - #257)
+| # | Issue Title | Category | Complexity | Status | GitHub Link |
+|---|---|---|---|---|---|
+| 233 | `[Backend] Distributed Sequence Number Reservation & Concurrency Queue Using Redis Redlock` | Server / Concurrency | `Advanced` | `Open` | [#233](https://github.com/utilityjnr1/lumena/issues/233) |
+| 234 | `[Backend] Multi-Tenant API Key Management with Scoped Permissions and Tiered Rate Quotas` | Server / Auth | `Intermediate` | `Open` | [#234](https://github.com/utilityjnr1/lumena/issues/234) |
+| 235 | `[Backend] SEP-10 Web Authentication Protocol Endpoint with JWT Issuance and Challenge Verification` | Server / Auth | `Advanced` | `Open` | [#235](https://github.com/utilityjnr1/lumena/issues/235) |
+| 236 | `[Backend] Webhook Dispatcher Retry Pipeline with Exponential Backoff and Dead-Letter Queue (DLQ)` | Server / Webhooks | `Intermediate` | `Open` | [#236](https://github.com/utilityjnr1/lumena/issues/236) |
+| 237 | `[Backend] OpenTelemetry Distributed Tracing Integration Across HTTP, Redis, and Stellar RPC` | Server / Observability | `Intermediate` | `Open` | [#237](https://github.com/utilityjnr1/lumena/issues/237) |
+| 238 | `[Backend] Dynamic Policy Engine Reload via Redis Pub/Sub Without Server Restarts` | Server / Policy | `Intermediate` | `Open` | [#238](https://github.com/utilityjnr1/lumena/issues/238) |
+| 239 | `[Backend] Hardware Security Module (HSM) PKCS#11 Signer Implementation for Enterprise Custody` | Server / Security | `Advanced` | `Open` | [#239](https://github.com/utilityjnr1/lumena/issues/239) |
+| 240 | `[Backend] Multi-Region Stellar Horizon & RPC Latency-Aware Failover Router` | Server / Stellar | `Advanced` | `Open` | [#240](https://github.com/utilityjnr1/lumena/issues/240) |
+| 241 | `[Backend] Real-Time Anomaly and Fraud Detection Service for Velocity Spikes and Geo-IP Shifts` | Server / Security | `Advanced` | `Open` | [#241](https://github.com/utilityjnr1/lumena/issues/241) |
+| 242 | `[Backend] Relational Database Persistence Layer (Prisma/PostgreSQL) for Policies and Audit Trails` | Server / Database | `Advanced` | `Open` | [#242](https://github.com/utilityjnr1/lumena/issues/242) |
+| 243 | `[Backend] Batch Cosigning Endpoint (POST /cosign/batch) with Atomic Policy Evaluation` | Server / API | `Intermediate` | `Open` | [#243](https://github.com/utilityjnr1/lumena/issues/243) |
+| 244 | `[Backend] Sliding-Window Token Bucket Rate Limiter per Wallet Address and Client IP` | Server / Middleware | `Intermediate` | `Open` | [#244](https://github.com/utilityjnr1/lumena/issues/244) |
+| 245 | `[Backend] RFC 7231 Idempotency-Key Support Across All Mutating Server Endpoints` | Server / Reliability | `Intermediate` | `Open` | [#245](https://github.com/utilityjnr1/lumena/issues/245) |
+| 246 | `[Backend] Granular Role-Based Access Control (RBAC) and Audit Logging for Admin APIs` | Server / Security | `Intermediate` | `Open` | [#246](https://github.com/utilityjnr1/lumena/issues/246) |
+| 247 | `[Backend] Graceful Shutdown Lifecycle Handler with In-Flight Transaction Draining` | Server / DevOps | `Intermediate` | `Open` | [#247](https://github.com/utilityjnr1/lumena/issues/247) |
+| 248 | `[Backend] Tamper-Proof Cryptographic Audit Log with Merkle Tree Hash Chaining` | Server / Cryptography | `Advanced` | `Open` | [#248](https://github.com/utilityjnr1/lumena/issues/248) |
+| 249 | `[Backend] Prometheus Alerting Rules, SLO Dashboards, and PagerDuty Webhook Integration` | Server / DevOps | `Intermediate` | `Open` | [#249](https://github.com/utilityjnr1/lumena/issues/249) |
+| 250 | `[Backend] WebSocket Server for Live Transaction Broadcasts, Confirmations, and Policy Events` | Server / Realtime | `Intermediate` | `Open` | [#250](https://github.com/utilityjnr1/lumena/issues/250) |
+| 251 | `[Backend] Hardened Production Docker Image with Multi-Stage Build and Non-Root User` | Server / Docker | `Intermediate` | `Open` | [#251](https://github.com/utilityjnr1/lumena/issues/251) |
+| 252 | `[Backend] Automatic Sponsor Hot-Wallet Refill Service via Exchange API and Horizon Listener` | Server / Sponsor | `Advanced` | `Open` | [#252](https://github.com/utilityjnr1/lumena/issues/252) |
+| 253 | `[Backend] Transaction Ingestion and Ledger Reconciliation Worker with Horizon Streaming` | Server / Ledger | `Advanced` | `Open` | [#253](https://github.com/utilityjnr1/lumena/issues/253) |
+| 254 | `[Backend] Anti-Replay Nonce Validation and Transaction Cache in Memory and Redis` | Server / Security | `Intermediate` | `Open` | [#254](https://github.com/utilityjnr1/lumena/issues/254) |
+| 255 | `[Backend] Dynamic CORS Domain Whitelist Provider with Live Database Backing` | Server / Security | `Beginner` | `Open` | [#255](https://github.com/utilityjnr1/lumena/issues/255) |
+| 256 | `[Backend] Health Diagnostics Self-Test Suite and Live Dependency Probing (/health/deep)` | Server / Reliability | `Intermediate` | `Open` | [#256](https://github.com/utilityjnr1/lumena/issues/256) |
+| 257 | `[Backend] GraphQL API Gateway with Subscriptions alongside Existing Express REST Endpoints` | Server / API | `Advanced` | `Open` | [#257](https://github.com/utilityjnr1/lumena/issues/257) |
 
-#### Part 3: Frontend SDK, React Hooks & UI Design System (#258 – #282)
-| # | Issue Title | Category | Complexity | Status |
-|---|---|---|---|---|
-| 258 | `[Frontend] Multi-Network Context Switcher and Network Status Bar in @lumen/react` | React / UI | `Intermediate` | `Open` |
-| 259 | `[Frontend] Type-Safe useSorobanContract Hook with Auto-Generated Contract ABIs` | React / Soroban | `Advanced` | `Open` |
-| 260 | `[Frontend] useSocialRecovery React Hook for Orchestrating Multi-Guardian Approval Flows` | React / Security | `Advanced` | `Open` |
-| 261 | `[Frontend] LumenConnectModal Pre-Built Responsive Authentication and Onboarding Modal` | React / UI | `Intermediate` | `Open` |
-| 262 | `[Frontend] useGaslessTransaction Hook with Optimistic State Updates and Auto-Rollback` | React / State | `Intermediate` | `Open` |
-| 263 | `[Frontend] LumenTransactionFeed Real-Time Animated Activity History Component` | React / UI | `Intermediate` | `Open` |
-| 264 | `[Frontend] useTokenAllowance and useApproveToken Hooks for SEP-41 Soroban Tokens` | React / Tokens | `Intermediate` | `Open` |
-| 265 | `[Frontend] Interactive Policy Builder and Spend Limit Editor UI Component` | React / UI | `Intermediate` | `Open` |
-| 266 | `[Frontend] LumenQrScanner Component with Camera Access, Flash Toggle, and URI Parsing` | React / Mobile | `Intermediate` | `Open` |
-| 267 | `[Frontend] Next.js App Router (RSC) Compatibility and Server Action Support in @lumen/react` | React / Next.js | `Advanced` | `Open` |
-| 268 | `[Frontend] Comprehensive Design Tokens and Dark/Light Theme Provider for Lumen UI` | React / Styling | `Intermediate` | `Open` |
-| 269 | `[Frontend] useSessionKeyManager Hook with Expiration Timer, Scoped Limits, and Revocation` | React / Auth | `Intermediate` | `Open` |
-| 270 | `[Frontend] WAI-ARIA Accessible Keyboard Navigation and Screen Reader Tags in All Components` | React / A11y | `Intermediate` | `Open` |
-| 271 | `[Frontend] Encrypted Client-Side Wallet State Persistence Driver (IndexedDB / WebCrypto)` | React / Storage | `Advanced` | `Open` |
-| 272 | `[Frontend] LumenSwapWidget Component for In-App Stellar DEX Path Payment Conversions` | React / DEX | `Advanced` | `Open` |
-| 273 | `[Frontend] useNetworkHealth Hook with RPC Latency Ping and Automatic Failover Alerting` | React / Network | `Intermediate` | `Open` |
-| 274 | `[Frontend] Interactive Storybook Design System and Component Showcase for @lumen/react` | React / Tooling | `Intermediate` | `Open` |
-| 275 | `[Frontend] React Native and Expo Mobile Adaptor Layer for Lumen Core and SDK` | React / Mobile | `Advanced` | `Open` |
-| 276 | `[Frontend] LumenErrorBoundary Component with Crash Reporting and Session Diagnostic Export` | React / Reliability | `Intermediate` | `Open` |
-| 277 | `[Frontend] Toast Notification Dispatcher for Transaction Lifecycle and Policy Warnings` | React / UI | `Intermediate` | `Open` |
-| 278 | `[Frontend] SSR-Safe Hydration Guards for Browser Cryptography and WebAuthn Primitives` | React / Architecture | `Intermediate` | `Open` |
-| 279 | `[Frontend] useMultiSigApproval Hook for Orchestrating Multi-Device Co-Signing Sessions` | React / Multisig | `Advanced` | `Open` |
-| 280 | `[Frontend] Virtualized List Rendering for High-Volume Transaction Histories in LumenWalletCard` | React / Performance | `Intermediate` | `Open` |
-| 281 | `[Frontend] Internationalization (i18n) Framework Support across All Prebuilt React Components` | React / i18n | `Intermediate` | `Open` |
-| 282 | `[Frontend] Revamped Interactive Playground with Real-Time Soroban Contract XDR Inspector` | React / Playground | `Intermediate` | `Open` |
+#### Part 3: Frontend SDK, React Hooks & UI Design System (#258 - #282)
+| # | Issue Title | Category | Complexity | Status | GitHub Link |
+|---|---|---|---|---|---|
+| 258 | `[Frontend] Multi-Network Context Switcher and Network Status Bar in @lumen/react` | React / UI | `Intermediate` | `Open` | [#258](https://github.com/utilityjnr1/lumena/issues/258) |
+| 259 | `[Frontend] Type-Safe useSorobanContract Hook with Auto-Generated Contract ABIs` | React / Soroban | `Advanced` | `Open` | [#259](https://github.com/utilityjnr1/lumena/issues/259) |
+| 260 | `[Frontend] useSocialRecovery React Hook for Orchestrating Multi-Guardian Approval Flows` | React / Security | `Advanced` | `Open` | [#260](https://github.com/utilityjnr1/lumena/issues/260) |
+| 261 | `[Frontend] LumenConnectModal Pre-Built Responsive Authentication and Onboarding Modal` | React / UI | `Intermediate` | `Open` | [#261](https://github.com/utilityjnr1/lumena/issues/261) |
+| 262 | `[Frontend] useGaslessTransaction Hook with Optimistic State Updates and Auto-Rollback` | React / State | `Intermediate` | `Open` | [#262](https://github.com/utilityjnr1/lumena/issues/262) |
+| 263 | `[Frontend] LumenTransactionFeed Real-Time Animated Activity History Component` | React / UI | `Intermediate` | `Open` | [#263](https://github.com/utilityjnr1/lumena/issues/263) |
+| 264 | `[Frontend] useTokenAllowance and useApproveToken Hooks for SEP-41 Soroban Tokens` | React / Tokens | `Intermediate` | `Open` | [#264](https://github.com/utilityjnr1/lumena/issues/264) |
+| 265 | `[Frontend] Interactive Policy Builder and Spend Limit Editor UI Component` | React / UI | `Intermediate` | `Open` | [#265](https://github.com/utilityjnr1/lumena/issues/265) |
+| 266 | `[Frontend] LumenQrScanner Component with Camera Access, Flash Toggle, and URI Parsing` | React / Mobile | `Intermediate` | `Open` | [#266](https://github.com/utilityjnr1/lumena/issues/266) |
+| 267 | `[Frontend] Next.js App Router (RSC) Compatibility and Server Action Support in @lumen/react` | React / Next.js | `Advanced` | `Open` | [#267](https://github.com/utilityjnr1/lumena/issues/267) |
+| 268 | `[Frontend] Comprehensive Design Tokens and Dark/Light Theme Provider for Lumen UI` | React / Styling | `Intermediate` | `Open` | [#268](https://github.com/utilityjnr1/lumena/issues/268) |
+| 269 | `[Frontend] useSessionKeyManager Hook with Expiration Timer, Scoped Limits, and Revocation` | React / Auth | `Intermediate` | `Open` | [#269](https://github.com/utilityjnr1/lumena/issues/269) |
+| 270 | `[Frontend] WAI-ARIA Accessible Keyboard Navigation and Screen Reader Tags in All Components` | React / A11y | `Intermediate` | `Open` | [#270](https://github.com/utilityjnr1/lumena/issues/270) |
+| 271 | `[Frontend] Encrypted Client-Side Wallet State Persistence Driver (IndexedDB / WebCrypto)` | React / Storage | `Advanced` | `Open` | [#271](https://github.com/utilityjnr1/lumena/issues/271) |
+| 272 | `[Frontend] LumenSwapWidget Component for In-App Stellar DEX Path Payment Conversions` | React / DEX | `Advanced` | `Open` | [#272](https://github.com/utilityjnr1/lumena/issues/272) |
+| 273 | `[Frontend] useNetworkHealth Hook with RPC Latency Ping and Automatic Failover Alerting` | React / Network | `Intermediate` | `Open` | [#273](https://github.com/utilityjnr1/lumena/issues/273) |
+| 274 | `[Frontend] Interactive Storybook Design System and Component Showcase for @lumen/react` | React / Tooling | `Intermediate` | `Open` | [#274](https://github.com/utilityjnr1/lumena/issues/274) |
+| 275 | `[Frontend] React Native and Expo Mobile Adaptor Layer for Lumen Core and SDK` | React / Mobile | `Advanced` | `Open` | [#275](https://github.com/utilityjnr1/lumena/issues/275) |
+| 276 | `[Frontend] LumenErrorBoundary Component with Crash Reporting and Session Diagnostic Export` | React / Reliability | `Intermediate` | `Open` | [#276](https://github.com/utilityjnr1/lumena/issues/276) |
+| 277 | `[Frontend] Toast Notification Dispatcher for Transaction Lifecycle and Policy Warnings` | React / UI | `Intermediate` | `Open` | [#277](https://github.com/utilityjnr1/lumena/issues/277) |
+| 278 | `[Frontend] SSR-Safe Hydration Guards for Browser Cryptography and WebAuthn Primitives` | React / Architecture | `Intermediate` | `Open` | [#278](https://github.com/utilityjnr1/lumena/issues/278) |
+| 279 | `[Frontend] useMultiSigApproval Hook for Orchestrating Multi-Device Co-Signing Sessions` | React / Multisig | `Advanced` | `Open` | [#279](https://github.com/utilityjnr1/lumena/issues/279) |
+| 280 | `[Frontend] Virtualized List Rendering for High-Volume Transaction Histories in LumenWalletCard` | React / Performance | `Intermediate` | `Open` | [#280](https://github.com/utilityjnr1/lumena/issues/280) |
+| 281 | `[Frontend] Internationalization (i18n) Framework Support across All Prebuilt React Components` | React / i18n | `Intermediate` | `Open` | [#281](https://github.com/utilityjnr1/lumena/issues/281) |
+| 282 | `[Frontend] Revamped Interactive Playground with Real-Time Soroban Contract XDR Inspector` | React / Playground | `Intermediate` | `Open` | [#282](https://github.com/utilityjnr1/lumena/issues/282) |
 
-#### Part 4: Core Cryptography, Stellar Protocols & Key Management (#283 – #297)
-| # | Issue Title | Category | Complexity | Status |
-|---|---|---|---|---|
-| 283 | `[Core] Decouple LumenClient from Requiring Sponsor Secret Key in Browser Environments` | Core / Security | `Advanced` | `Open` |
-| 284 | `[Core] WebAuthn P-256 to Ed25519 Signature Converter and Verification Helper` | Core / Cryptography | `Advanced` | `Open` |
-| 285 | `[Core] BIP-44 Multi-Account Hierarchical Deterministic (HD) Key Derivation Engine` | Core / Keys | `Intermediate` | `Open` |
-| 286 | `[Core] SEP-0030 Web3 Account Recovery Protocol Client Implementation` | Core / SEP | `Advanced` | `Open` |
-| 287 | `[Core] SEP-0024 Hosted Deposit and Withdrawal Interactive Flow Integration` | Core / SEP | `Advanced` | `Open` |
-| 288 | `[Core] SEP-0038 Anchor Platform Cross-Asset Quotes API Client Integration` | Core / SEP | `Intermediate` | `Open` |
-| 289 | `[Core] Zero-Knowledge Proof (zk-SNARK) Verification Engine for Anonymous Policy Compliance` | Core / Privacy | `Advanced` | `Open` |
-| 290 | `[Core] Cross-Platform Encrypted Keystore with WebCrypto API and Argon2id Key Derivation` | Core / Security | `Advanced` | `Open` |
-| 291 | `[Core] Air-Gapped Offline Transaction Drafting and Animated QR-Code Signer Pipeline` | Core / Security | `Advanced` | `Open` |
-| 292 | `[Core] Native Support for Stellar Muxed Accounts (MED25519 / M... addresses)` | Core / Stellar | `Intermediate` | `Open` |
-| 293 | `[Core] Dynamic Fee-Bump Estimator with Horizon Ledger Surge Pricing Analysis` | Core / Fees | `Intermediate` | `Open` |
-| 294 | `[Core] Soroban WASM Metadata Parser and ScVal Type Serializer Generator` | Core / Soroban | `Advanced` | `Open` |
-| 295 | `[Core] WebSocket Event Client for Stellar Horizon Streaming and Soroban RPC Topics` | Core / Networking | `Intermediate` | `Open` |
-| 296 | `[Core] Pluggable SDK Telemetry, Diagnostics Hook, and Structured Logger Interface` | Core / Observability | `Intermediate` | `Open` |
-| 297 | `[Core] Tree-Shakable Package Bundle Optimization Reducing Web SDK Footprint to Under 45KB` | Core / Performance | `Intermediate` | `Open` |
+#### Part 4: Core Cryptography, Stellar Protocols & Key Management (#283 - #297)
+| # | Issue Title | Category | Complexity | Status | GitHub Link |
+|---|---|---|---|---|---|
+| 283 | `[Core] Decouple LumenClient from Requiring Sponsor Secret Key in Browser Environments` | Core / Security | `Advanced` | `Open` | [#283](https://github.com/utilityjnr1/lumena/issues/283) |
+| 284 | `[Core] WebAuthn P-256 to Ed25519 Signature Converter and Verification Helper` | Core / Cryptography | `Advanced` | `Open` | [#284](https://github.com/utilityjnr1/lumena/issues/284) |
+| 285 | `[Core] BIP-44 Multi-Account Hierarchical Deterministic (HD) Key Derivation Engine` | Core / Keys | `Intermediate` | `Open` | [#285](https://github.com/utilityjnr1/lumena/issues/285) |
+| 286 | `[Core] SEP-0030 Web3 Account Recovery Protocol Client Implementation` | Core / SEP | `Advanced` | `Open` | [#286](https://github.com/utilityjnr1/lumena/issues/286) |
+| 287 | `[Core] SEP-0024 Hosted Deposit and Withdrawal Interactive Flow Integration` | Core / SEP | `Advanced` | `Open` | [#287](https://github.com/utilityjnr1/lumena/issues/287) |
+| 288 | `[Core] SEP-0038 Anchor Platform Cross-Asset Quotes API Client Integration` | Core / SEP | `Intermediate` | `Open` | [#288](https://github.com/utilityjnr1/lumena/issues/288) |
+| 289 | `[Core] Zero-Knowledge Proof (zk-SNARK) Verification Engine for Anonymous Policy Compliance` | Core / Privacy | `Advanced` | `Open` | [#289](https://github.com/utilityjnr1/lumena/issues/289) |
+| 290 | `[Core] Cross-Platform Encrypted Keystore with WebCrypto API and Argon2id Key Derivation` | Core / Security | `Advanced` | `Open` | [#290](https://github.com/utilityjnr1/lumena/issues/290) |
+| 291 | `[Core] Air-Gapped Offline Transaction Drafting and Animated QR-Code Signer Pipeline` | Core / Security | `Advanced` | `Open` | [#291](https://github.com/utilityjnr1/lumena/issues/291) |
+| 292 | `[Core] Native Support for Stellar Muxed Accounts (MED25519 / M... addresses)` | Core / Stellar | `Intermediate` | `Open` | [#292](https://github.com/utilityjnr1/lumena/issues/292) |
+| 293 | `[Core] Dynamic Fee-Bump Estimator with Horizon Ledger Surge Pricing Analysis` | Core / Fees | `Intermediate` | `Open` | [#293](https://github.com/utilityjnr1/lumena/issues/293) |
+| 294 | `[Core] Soroban WASM Metadata Parser and ScVal Type Serializer Generator` | Core / Soroban | `Advanced` | `Open` | [#294](https://github.com/utilityjnr1/lumena/issues/294) |
+| 295 | `[Core] WebSocket Event Client for Stellar Horizon Streaming and Soroban RPC Topics` | Core / Networking | `Intermediate` | `Open` | [#295](https://github.com/utilityjnr1/lumena/issues/295) |
+| 296 | `[Core] Pluggable SDK Telemetry, Diagnostics Hook, and Structured Logger Interface` | Core / Observability | `Intermediate` | `Open` | [#296](https://github.com/utilityjnr1/lumena/issues/296) |
+| 297 | `[Core] Tree-Shakable Package Bundle Optimization Reducing Web SDK Footprint to Under 45KB` | Core / Performance | `Intermediate` | `Open` | [#297](https://github.com/utilityjnr1/lumena/issues/297) |
 
-#### Part 5: Tooling, CLI, DevOps, Observability & Auditing (#298 – #312)
-| # | Issue Title | Category | Complexity | Status |
-|---|---|---|---|---|
-| 298 | `[Tooling] Interactive CLI Onboarding Wizard (lumen init) with Environment & Key Setup` | CLI / Tooling | `Intermediate` | `Open` |
-| 299 | `[Tooling] CLI Soroban Contract Deployment and Invocation Tooling (lumen contract)` | CLI / Soroban | `Advanced` | `Open` |
-| 300 | `[Tooling] CLI Policy Dry-Run and Simulation Engine for Offline Policy Evaluation` | CLI / Policy | `Intermediate` | `Open` |
-| 301 | `[Tooling] Static Security Linter and AST Analyzer for Stellar XDR Injection Vulnerabilities` | Tooling / Security | `Advanced` | `Open` |
-| 302 | `[Tooling] Automated High-Throughput Load and Concurrency Benchmark Suite with k6` | Tooling / QA | `Intermediate` | `Open` |
-| 303 | `[Tooling] GitHub Actions CI Pipeline for Soroban Contract Compilation, Stripping, and ABI Export` | DevOps / CI/CD | `Intermediate` | `Open` |
-| 304 | `[Tooling] Automated Local Stellar Standalone Container E2E Test Suite in CI` | DevOps / CI/CD | `Advanced` | `Open` |
-| 305 | `[Tooling] Interactive Documentation Site with Embedded Code Playground using Starlight` | Docs / Tooling | `Intermediate` | `Open` |
-| 306 | `[Tooling] Secure CLI Keystore Export and Migration Tool with AES-GCM Encryption` | CLI / Security | `Intermediate` | `Open` |
-| 307 | `[Tooling] Automated Changeset Release and Multi-Package NPM Publishing Workflow` | DevOps / CI/CD | `Intermediate` | `Open` |
-| 308 | `[Tooling] Real-Time CLI Audit Stream (lumen audit) for Monitoring Policy Decisions` | CLI / Observability | `Intermediate` | `Open` |
-| 309 | `[Tooling] Mutation and Differential Fuzz Testing Harness for Transaction Building and Policy Checks` | Tooling / Security | `Advanced` | `Open` |
-| 310 | `[Tooling] Multi-Container Docker Compose Stack with Stellar RPC, Redis Cluster, and PostgreSQL` | DevOps / Docker | `Intermediate` | `Open` |
-| 311 | `[Tooling] Synthetic Transaction Monitoring Canary Daemon for Production Health Probing` | DevOps / Reliability | `Advanced` | `Open` |
-| 312 | `[Tooling] Comprehensive Developer Video Onboarding Script and Quickstart Interactive Tutorials` | Docs / Onboarding | `Beginner` | `Open` |
+#### Part 5: Tooling, CLI, DevOps, Observability & Auditing (#298 - #312)
+| # | Issue Title | Category | Complexity | Status | GitHub Link |
+|---|---|---|---|---|---|
+| 298 | `[Tooling] Interactive CLI Onboarding Wizard (lumen init) with Environment & Key Setup` | CLI / Tooling | `Intermediate` | `Open` | [#298](https://github.com/utilityjnr1/lumena/issues/298) |
+| 299 | `[Tooling] CLI Soroban Contract Deployment and Invocation Tooling (lumen contract)` | CLI / Soroban | `Advanced` | `Open` | [#299](https://github.com/utilityjnr1/lumena/issues/299) |
+| 300 | `[Tooling] CLI Policy Dry-Run and Simulation Engine for Offline Policy Evaluation` | CLI / Policy | `Intermediate` | `Open` | [#300](https://github.com/utilityjnr1/lumena/issues/300) |
+| 301 | `[Tooling] Static Security Linter and AST Analyzer for Stellar XDR Injection Vulnerabilities` | Tooling / Security | `Advanced` | `Open` | [#301](https://github.com/utilityjnr1/lumena/issues/301) |
+| 302 | `[Tooling] Automated High-Throughput Load and Concurrency Benchmark Suite with k6` | Tooling / QA | `Intermediate` | `Open` | [#302](https://github.com/utilityjnr1/lumena/issues/302) |
+| 303 | `[Tooling] GitHub Actions CI Pipeline for Soroban Contract Compilation, Stripping, and ABI Export` | DevOps / CI/CD | `Intermediate` | `Open` | [#303](https://github.com/utilityjnr1/lumena/issues/303) |
+| 304 | `[Tooling] Automated Local Stellar Standalone Container E2E Test Suite in CI` | DevOps / CI/CD | `Advanced` | `Open` | [#304](https://github.com/utilityjnr1/lumena/issues/304) |
+| 305 | `[Tooling] Interactive Documentation Site with Embedded Code Playground using Starlight` | Docs / Tooling | `Intermediate` | `Open` | [#305](https://github.com/utilityjnr1/lumena/issues/305) |
+| 306 | `[Tooling] Secure CLI Keystore Export and Migration Tool with AES-GCM Encryption` | CLI / Security | `Intermediate` | `Open` | [#306](https://github.com/utilityjnr1/lumena/issues/306) |
+| 307 | `[Tooling] Automated Changeset Release and Multi-Package NPM Publishing Workflow` | DevOps / CI/CD | `Intermediate` | `Open` | [#307](https://github.com/utilityjnr1/lumena/issues/307) |
+| 308 | `[Tooling] Real-Time CLI Audit Stream (lumen audit) for Monitoring Policy Decisions` | CLI / Observability | `Intermediate` | `Open` | [#308](https://github.com/utilityjnr1/lumena/issues/308) |
+| 309 | `[Tooling] Mutation and Differential Fuzz Testing Harness for Transaction Building and Policy Checks` | Tooling / Security | `Advanced` | `Open` | [#309](https://github.com/utilityjnr1/lumena/issues/309) |
+| 310 | `[Tooling] Multi-Container Docker Compose Stack with Stellar RPC, Redis Cluster, and PostgreSQL` | DevOps / Docker | `Intermediate` | `Open` | [#310](https://github.com/utilityjnr1/lumena/issues/310) |
+| 311 | `[Tooling] Synthetic Transaction Monitoring Canary Daemon for Production Health Probing` | DevOps / Reliability | `Advanced` | `Open` | [#311](https://github.com/utilityjnr1/lumena/issues/311) |
+| 312 | `[Tooling] Comprehensive Developer Video Onboarding Script and Quickstart Interactive Tutorials` | Docs / Onboarding | `Beginner` | `Open` | [#312](https://github.com/utilityjnr1/lumena/issues/312) |
 
 ---
 
-## Detailed Specifications for Active Issues (#213 – #312)
+## Detailed Specifications for Active Issues (#213 - #312)
 
-### Part 1: Soroban Smart Contracts & On-Chain Account Abstraction (#213 – #232)
+### Part 1: Soroban Smart Contracts & On-Chain Account Abstraction (#213 - #232)
 
 #### #213 [Contract] Native Soroban Smart Account Contract with Pluggable Signers and WebAuthn Verification
 - **Target:** `contracts/smart-account/`
@@ -373,7 +373,7 @@ This major batch of 100 high-impact open issues covers critical engineering prio
 
 ---
 
-### Part 2: Backend Architecture, Server Scaling & Security (#233 – #257)
+### Part 2: Backend Architecture, Server Scaling & Security (#233 - #257)
 
 #### #233 [Backend] Distributed Sequence Number Reservation & Concurrency Queue Using Redis Redlock
 - **Target:** `packages/server/src/fee-sponsor/`, `packages/server/src/cosigner/`
@@ -579,7 +579,7 @@ This major batch of 100 high-impact open issues covers critical engineering prio
 
 ---
 
-### Part 3: Frontend SDK, React Hooks & UI Design System (#258 – #282)
+### Part 3: Frontend SDK, React Hooks & UI Design System (#258 - #282)
 
 #### #258 [Frontend] Multi-Network Context Switcher and Network Status Bar in @lumen/react
 - **Target:** `packages/react/src/context.tsx`, `packages/react/src/components/LumenNetworkBar.tsx`
@@ -784,7 +784,7 @@ This major batch of 100 high-impact open issues covers critical engineering prio
 
 ---
 
-### Part 4: Core Cryptography, Stellar Protocols & Key Management (#283 – #297)
+### Part 4: Core Cryptography, Stellar Protocols & Key Management (#283 - #297)
 
 #### #283 [Core] Decouple LumenClient from Requiring Sponsor Secret Key in Browser Environments
 - **Target:** `packages/web-sdk/src/client.ts`, `packages/core/src/wallet/wallet.ts`
@@ -906,7 +906,7 @@ This major batch of 100 high-impact open issues covers critical engineering prio
 
 ---
 
-### Part 5: Tooling, CLI, DevOps, Observability & Auditing (#298 – #312)
+### Part 5: Tooling, CLI, DevOps, Observability & Auditing (#298 - #312)
 
 #### #298 [Tooling] Interactive CLI Onboarding Wizard (lumen init) with Environment & Key Setup
 - **Target:** `packages/cli/src/commands/init.ts`
@@ -1035,3 +1035,5 @@ This major batch of 100 high-impact open issues covers critical engineering prio
 If you have questions about any issue or implementation details:
 - Comment on the corresponding [GitHub Issue](https://github.com/utilityjnr1/lumena/issues).
 - Check the [Documentation](./docs) directory for design specs and key management architecture.
+
+
