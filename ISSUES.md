@@ -158,10 +158,10 @@ This major batch of 100 high-impact open issues covers critical engineering prio
 | 276 | `[Frontend] LumenErrorBoundary Component with Crash Reporting and Session Diagnostic Export` | React / Reliability | `Intermediate` | `Open` | [#276](https://github.com/utilityjnr1/lumena/issues/276) |
 | 277 | `[Frontend] Toast Notification Dispatcher for Transaction Lifecycle and Policy Warnings` | React / UI | `Intermediate` | `Open` | [#277](https://github.com/utilityjnr1/lumena/issues/277) |
 | 278 | `[Frontend] SSR-Safe Hydration Guards for Browser Cryptography and WebAuthn Primitives` | React / Architecture | `Intermediate` | `Open` | [#278](https://github.com/utilityjnr1/lumena/issues/278) |
-| 279 | `[Frontend] useMultiSigApproval Hook for Orchestrating Multi-Device Co-Signing Sessions` | React / Multisig | `Advanced` | `Open` | [#279](https://github.com/utilityjnr1/lumena/issues/279) |
-| 280 | `[Frontend] Virtualized List Rendering for High-Volume Transaction Histories in LumenWalletCard` | React / Performance | `Intermediate` | `Open` | [#280](https://github.com/utilityjnr1/lumena/issues/280) |
-| 281 | `[Frontend] Internationalization (i18n) Framework Support across All Prebuilt React Components` | React / i18n | `Intermediate` | `Open` | [#281](https://github.com/utilityjnr1/lumena/issues/281) |
-| 282 | `[Frontend] Revamped Interactive Playground with Real-Time Soroban Contract XDR Inspector` | React / Playground | `Intermediate` | `Open` | [#282](https://github.com/utilityjnr1/lumena/issues/282) |
+| 279 | `[Frontend] useMultiSigApproval Hook for Orchestrating Multi-Device Co-Signing Sessions` | React / Multisig | `Advanced` | `Completed` | [#279](https://github.com/utilityjnr1/lumena/issues/279) |
+| 280 | `[Frontend] Virtualized List Rendering for High-Volume Transaction Histories in LumenWalletCard` | React / Performance | `Intermediate` | `Completed` | [#280](https://github.com/utilityjnr1/lumena/issues/280) |
+| 281 | `[Frontend] Internationalization (i18n) Framework Support across All Prebuilt React Components` | React / i18n | `Intermediate` | `Completed` | [#281](https://github.com/utilityjnr1/lumena/issues/281) |
+| 282 | `[Frontend] Revamped Interactive Playground with Real-Time Soroban Contract XDR Inspector` | React / Playground | `Intermediate` | `Completed` | [#282](https://github.com/utilityjnr1/lumena/issues/282) |
 
 #### Part 4: Core Cryptography, Stellar Protocols & Key Management (#283 - #297)
 | # | Issue Title | Category | Complexity | Status | GitHub Link |

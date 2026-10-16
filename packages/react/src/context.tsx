@@ -18,11 +18,18 @@ export const LumenContext = createContext<LumenContextValue | null>(null);
 
 export interface LumenProviderProps {
   client: LumenClient;
+  /**
+   * BCP-47 locale code used to translate all prebuilt Lumen UI components.
+   * Supported values: "en" | "es" | "pt" | "fr" | "ja"
+   * Defaults to "en".
+   */
+  locale?: LumenLocale;
   children: React.ReactNode;
 }
 
 export function LumenProvider({
   client,
+  locale = "en",
   children,
 }: LumenProviderProps) {
   const isMounted = useIsMounted();
